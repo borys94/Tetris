@@ -13,7 +13,7 @@ const Container = styled.div`
 `;
 
 const StartContainer = styled.div`
-  display: flex;
+  display: flex; 
   justify-content: center;
   flex-direction: column;
   margin: auto;
