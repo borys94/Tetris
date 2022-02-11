@@ -1,6 +1,7 @@
 {
   "name": "tetris",
   "version": "0.1.0",
+  "main": "./build.html",
   "private": true,
   "homepage": "https://borys94.github.io/Tetris/",
   "dependencies": {
