@@ -2,21 +2,11 @@
   "name": "tetris",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://borys94.github.io/tetris/",
   "dependencies": {
-    "@testing-library/jest-dom": "^5.16.2",
-    "@testing-library/react": "^12.1.2",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.4.0",
-    "@types/node": "^16.11.24",
-    "@types/react": "^17.0.39",
-    "@types/react-dom": "^17.0.11",
-    "prettier": "^2.5.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-scripts": "5.0.0",
-    "styled-component": "^2.8.0",
     "styled-components": "^5.3.3",
-    "typescript": "^4.5.5",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -24,7 +14,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "prettier": "prettier --write src"
+    "prettier": "prettier --write src",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -45,6 +37,17 @@
     ]
   },
   "devDependencies": {
-    "@types/styled-components": "^5.1.22"
+    "@testing-library/jest-dom": "^5.16.2",
+    "@testing-library/react": "^12.1.2",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.4.0",
+    "@types/node": "^16.11.24",
+    "@types/react": "^17.0.39",
+    "@types/react-dom": "^17.0.11",
+    "@types/styled-components": "^5.1.22",
+    "gh-pages": "^3.2.3",
+    "prettier": "^2.5.1",
+    "react-scripts": "5.0.0",
+    "typescript": "^4.5.5"
   }
 }
