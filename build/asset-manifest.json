@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/tetris/static/css/main.6663bc85.css",
+    "main.js": "/tetris/static/js/main.10e5b52b.js",
+    "static/js/787.0ef42b96.chunk.js": "/tetris/static/js/787.0ef42b96.chunk.js",
+    "static/media/ARCADE.TTF": "/tetris/static/media/ARCADE.0908c501a4d2c9da77ed.TTF",
+    "index.html": "/tetris/index.html",
+    "main.6663bc85.css.map": "/tetris/static/css/main.6663bc85.css.map",
+    "main.10e5b52b.js.map": "/tetris/static/js/main.10e5b52b.js.map",
+    "787.0ef42b96.chunk.js.map": "/tetris/static/js/787.0ef42b96.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.6663bc85.css",
+    "static/js/main.10e5b52b.js"
+  ]
+}
