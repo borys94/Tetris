@@ -1,42 +1,61 @@
 import styled from "styled-components";
-import OptionBox from "./OptionBox";
+import { Panel } from "react95";
+
 import Shape from "../../core/Shape";
 import Brick from "../Brick";
-import Text from "../Text";
 
 type Props = {
-  shape: Shape | null;
+  shapes: Shape[] | null;
 };
 
 const Content = styled.div`
-  height: 220px;
+  min-height: 260px;
 `;
 
 const ShapeContainer = styled.div`
-  padding-top: 40px;
+  padding-top: 20px;
   position: relative;
 `;
 
-const ShapeComponent = (props: Props) => (
-  <div>
-    {props.shape &&
-      props.shape.getPositions().map((row, y) => {
-        return [0, ...row, 0].map((color: number, x) => (
-          <Brick x={x} y={y} color={color as never} />
-        ));
-      })}
-  </div>
-);
+type ShapeComponentProps = {
+  shape: Shape;
+};
+const ShapeComponent = (props: ShapeComponentProps) => {
+  let positions = props.shape ? props.shape.getPositions() : [[]];
+  positions = positions.filter((row) => row.find((color) => color));
+  let minX = 5;
+  let maxX = 0;
+  positions.forEach((row, y) => {
+    row.forEach((color, x) => {
+      if (positions[y][x]) {
+        minX = Math.min(minX, x);
+        maxX = Math.max(maxX, x);
+      }
+    });
+  });
+  return (
+    <div style={{ height: 20 * positions.length + 20, position: "relative" }}>
+      {props.shape &&
+        positions.map((row, y) => {
+          return row.map((color: number, x) =>
+            color !== 0 ? (
+              <Brick x={x - minX + 1} y={y} color={color as never} size={20} />
+            ) : null
+          );
+        })}
+    </div>
+  );
+};
 
 const Score = (props: Props) => (
-  <OptionBox>
+  <Panel variant="well" style={{ width: "100%" }}>
     <Content>
-      <Text>Next</Text>
       <ShapeContainer>
-        <ShapeComponent shape={props.shape} />
+        {props.shapes &&
+          props.shapes.map((shape, index) => <ShapeComponent shape={shape} />)}
       </ShapeContainer>
     </Content>
-  </OptionBox>
+  </Panel>
 );
 
 export default Score;

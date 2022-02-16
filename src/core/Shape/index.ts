@@ -14,7 +14,7 @@ export default class Shape {
   static createRandomShape() {
     const enumValues = Object.keys(ShapeType);
     const randomIndex = Math.floor(Math.random() * enumValues.length);
-    const color = Math.floor(Math.random() * 6) + 1;
+    const color = Math.floor(Math.random() * 7) + 1;
     return new Shape(enumValues[randomIndex] as unknown as ShapeType, color);
   }
 

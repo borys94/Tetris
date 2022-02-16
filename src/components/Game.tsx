@@ -1,17 +1,15 @@
 import React from "react";
 import styled from "styled-components";
+import { Panel } from "react95";
 
+import AppBar from "./AppBar";
 import Brick from "./Brick";
 import Board from "./Board";
-import Score from "./Options/Score";
-import Box from "./Box";
-import NextShape from "./Options/NextShape";
-import Level from "./Options/Level";
-import { Button } from "./Button";
+import Options from "./Options";
+import Engine from "../core/Engine";
+
 import { BOARD_WIDTH, BOARD_HEIGHT } from "../constants";
 import { GameState, GameEvent } from "../types";
-
-import Engine from "../core/Engine";
 
 export const Container = styled.div`
   position: relative;
@@ -23,25 +21,22 @@ const GameContainer = styled.div`
   position relative;
   width: 900px;
   display: flex;
+  margin-top: 50px;
   justify-content: center;
 `;
 
 const OptionsContainer = styled.div`
+  position: absolute;
+  left: 0;
+  top: 50px;
   display: flex;
   flex-direction: column;
   margin-left: 20px;
-  font-size: 40px;
+  font-size: 18px;
 
   > div:not(:last-child) {
     margin-bottom: 20px;
   }
-`;
-
-const ButtonsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-top: auto;
-  margin-bottom: 0;
 `;
 
 type State = {
@@ -49,6 +44,7 @@ type State = {
   width: number;
   height: number;
   gameState: GameState | null;
+  reducedRows: number;
 };
 
 class Game extends React.Component<{}, State> {
@@ -60,18 +56,19 @@ class Game extends React.Component<{}, State> {
     width: BOARD_WIDTH,
     height: BOARD_HEIGHT,
     gameState: null,
+    reducedRows: 0,
   };
 
   componentDidMount() {
     window.addEventListener("keydown", this.onKeyDown);
-    this.startNewGame();
+    this.engine = new Engine(this.state.width, this.state.height, this.onEvent);
   }
 
   startNewGame = () => {
-    this.engine = new Engine(this.state.width, this.state.height, this.onEvent);
-    this.setState({
-      gameState: this.engine.getState(),
-    });
+    if (this.engine) {
+      this.engine.startNewGame();
+      this.start();
+    }
   };
 
   pause = () => {
@@ -89,12 +86,10 @@ class Game extends React.Component<{}, State> {
   onEvent = (gameEvent: GameEvent) => {
     if (gameEvent.name === "UPDATE_BOARD") {
       this.updateBoard(gameEvent.data);
-    } else if (gameEvent.name === "ON_START") {
-      this.onStart();
-    } else if (gameEvent.name === "ON_PAUSE") {
-      this.onPause();
-    } else if (gameEvent.name === "ON_FINISH") {
-      this.onFinish();
+    } else if (gameEvent.name === "ON_SET_GAME_STATE") {
+      this.setGameState(gameEvent.data);
+    } else if (gameEvent.name === "ON_REDUCED_ROWS_CHANGE") {
+      this.setState({ reducedRows: gameEvent.data });
     }
   };
 
@@ -117,16 +112,8 @@ class Game extends React.Component<{}, State> {
     this.setState({ board });
   };
 
-  onPause = () => {
-    this.setState({ gameState: GameState.Pause });
-  };
-
-  onStart = () => {
-    this.setState({ gameState: GameState.Started });
-  };
-
-  onFinish = () => {
-    this.setState({ gameState: GameState.Finished });
+  setGameState = (gameState: GameState) => {
+    this.setState({ gameState });
   };
 
   renderBoard() {
@@ -143,33 +130,30 @@ class Game extends React.Component<{}, State> {
       return null;
     }
     return (
-      <GameContainer>
-        <Box>
-          <Board width={this.state.width} height={this.state.height}>
-            <Container>{this.renderBoard()}</Container>
-          </Board>
-        </Box>
-        <OptionsContainer>
-          <Score score={this.engine.getScore()} />
-          <NextShape shape={this.engine.getNextShape()} />
-          <Level level={this.engine.getLevel()} />
-          <ButtonsContainer>
-            {this.state.gameState === GameState.Started && (
-              <Button onClick={this.pause}>Pause</Button>
-            )}
-            {this.state.gameState === GameState.Pause && (
-              <Button onClick={this.start}>Start</Button>
-            )}
-            {this.state.gameState === GameState.ReadyToStart && (
-              <Button onClick={this.start}>Start</Button>
-            )}
-            {this.state.gameState === GameState.Finished && (
-              <Button onClick={this.startNewGame}>Try again</Button>
-            )}
-            <Button>Quit</Button>
-          </ButtonsContainer>
-        </OptionsContainer>
-      </GameContainer>
+      <>
+        <AppBar
+          startNewGame={this.startNewGame}
+          start={this.start}
+          pause={this.pause}
+          canPause={this.state.gameState === GameState.Started}
+          canStart={this.state.gameState === GameState.Pause}
+        />
+        <GameContainer>
+          <OptionsContainer>
+            <Options
+              score={this.engine.getScore()}
+              shapes={this.engine.getNextShapes()}
+              level={this.engine.getLevel()}
+              reducedRows={this.state.reducedRows}
+            />
+          </OptionsContainer>
+          <Panel style={{ padding: 5 }}>
+            <Board width={this.state.width} height={this.state.height}>
+              <Container>{this.renderBoard()}</Container>
+            </Board>
+          </Panel>
+        </GameContainer>
+      </>
     );
   }
 }
