@@ -9,6 +9,7 @@ export enum ShapeType {
 }
 
 export enum GameState {
+  NotReady,
   ReadyToStart,
   Started,
   Pause,
@@ -17,11 +18,10 @@ export enum GameState {
 
 export type GameEventName =
   | "UPDATE_BOARD"
-  | "ON_START"
-  | "ON_PAUSE"
-  | "ON_FINISH"
   | "ON_LEVEL_UP"
-  | "ON_SCORE_CHANGE";
+  | "ON_SCORE_CHANGE"
+  | "ON_REDUCED_ROWS_CHANGE"
+  | "ON_SET_GAME_STATE";
 
 export interface GameEvent {
   name: GameEventName;

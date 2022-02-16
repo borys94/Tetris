@@ -1,6 +1,10 @@
-import styled from "styled-components";
-
+import styled, { createGlobalStyle, ThemeProvider } from "styled-components";
+import original from "react95/dist/themes/original";
 import Game from "./components/Game";
+
+const GlobalStyles = createGlobalStyle`
+
+`;
 
 const Container = styled.div`
   display: flex;
@@ -13,7 +17,7 @@ const Container = styled.div`
 `;
 
 const StartContainer = styled.div`
-  display: flex; 
+  display: flex;
   justify-content: center;
   flex-direction: column;
   margin: auto;
@@ -22,9 +26,12 @@ const StartContainer = styled.div`
 function App() {
   return (
     <Container className="App">
-      <StartContainer>
-        <Game />
-      </StartContainer>
+      <ThemeProvider theme={original}>
+        <StartContainer>
+          <Game />
+        </StartContainer>
+      </ThemeProvider>
+      <GlobalStyles />
     </Container>
   );
 }

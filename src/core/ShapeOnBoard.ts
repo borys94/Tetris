@@ -87,11 +87,13 @@ export default class ShapeOnBoard {
         if (
           shape[y][x] &&
           (this.positionY + +y + yShift >= this.board.getHeight() ||
-            this.positionY + +y + yShift < 0 ||
+            this.positionY + +y + yShift < -2 ||
             this.positionX + +x + xShift < 0 ||
             this.positionX + +x + xShift >= this.board.getWidth() ||
-            heap[this.positionY + +y + yShift][this.positionX + +x + xShift] !==
-              0)
+            (this.positionY + +y + yShift >= 0 &&
+              heap[this.positionY + +y + yShift][
+                this.positionX + +x + xShift
+              ] !== 0))
         ) {
           return false;
         }

@@ -16,7 +16,7 @@ const GameBoard = styled.div.attrs<Props>((props) => ({
 }))`
   width: 100%;
   height: 100%;
-  box-sizing: border-box;
+  border: 5px solid #cecbcf;
   display: flex;
   flex-wrap: wrap;
   position: relative;

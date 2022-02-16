@@ -6,14 +6,16 @@ import Level from "./Level";
 import { BOARD_WIDTH, BOARD_HEIGHT } from "../constants";
 import { GameState, GameEvent } from "../types";
 
+const NEXT_SHAPES_COUNT = 4;
+
 export default class Engine {
   private board: Board | null = null;
   private shape: Shape | null = null;
-  private nextShape: Shape | null = null;
+  private nextShapes: Shape[] | null = null;
   private shapeOnBoard: ShapeOnBoard | null = null;
   private score: Score;
   private level: Level;
-  private state: GameState = GameState.ReadyToStart;
+  private state: GameState = GameState.NotReady;
   private timestamp: number = Date.now();
 
   private onEvent: (event: GameEvent) => void;
@@ -24,14 +26,12 @@ export default class Engine {
     onEvent: (event: GameEvent) => void
   ) {
     this.board = new Board(width, height);
-    this.score = new Score();
-    this.level = new Level(this.score);
+    this.level = new Level();
+    this.score = new Score(this.level);
 
     this.onEvent = onEvent;
-    this.onEvent({
-      name: "UPDATE_BOARD",
-      data: this.getHeap(),
-    });
+    this.setState(GameState.ReadyToStart);
+    this.onUpdateBoard();
   }
 
   private run() {
@@ -45,29 +45,44 @@ export default class Engine {
     }
   }
 
+  // TODO
+  startNewGame() {
+    console.log("start new game");
+    this.board = new Board(BOARD_WIDTH, BOARD_HEIGHT);
+    this.level = new Level();
+    this.score = new Score(this.level);
+    this.setState(GameState.Started);
+
+    this.onUpdateBoard();
+  }
+
   start() {
     if (!this.board) {
       return;
     }
 
-    this.state = GameState.Started;
+    this.setState(GameState.Started);
     window.requestAnimationFrame(() => {
       this.run();
     });
 
-    this.onEvent({ name: "ON_START" });
-
     if (!this.shape) {
       this.shape = Shape.createRandomShape();
-      this.nextShape = Shape.createRandomShape();
+      this.nextShapes = new Array(NEXT_SHAPES_COUNT).fill(null).map((count) => {
+        return Shape.createRandomShape();
+      });
       this.shapeOnBoard = new ShapeOnBoard(this.shape, this.board);
-      this.state = GameState.Started;
+      this.setState(GameState.Started);
     }
   }
 
+  setState(state: GameState) {
+    this.state = state;
+    this.onEvent({ name: "ON_SET_GAME_STATE", data: state });
+  }
+
   pause() {
-    this.state = GameState.Pause;
-    this.onEvent({ name: "ON_PAUSE" });
+    this.setState(GameState.Pause);
   }
 
   private nextStep = () => {
@@ -75,13 +90,18 @@ export default class Engine {
       this.shapeOnBoard === null ||
       this.board === null ||
       this.shape === null ||
-      this.nextShape === null
+      this.nextShapes === null
     ) {
       return;
     }
     const reducedRows = this.board.tryReduce();
     if (reducedRows) {
       this.score.addPoints(reducedRows);
+      this.level.addReducedRows(reducedRows);
+      this.onEvent({
+        name: "ON_REDUCED_ROWS_CHANGE",
+        data: this.level.getReducedRows(),
+      });
     }
 
     if (this.shapeOnBoard.colisionInNextStep()) {
@@ -90,12 +110,12 @@ export default class Engine {
         this.shapeOnBoard.getPositionX(),
         this.shapeOnBoard.getPositionY()
       );
-      this.shape = this.nextShape;
-      this.nextShape = Shape.createRandomShape();
+      this.shape = this.nextShapes[0];
+      this.nextShapes.shift();
+      this.nextShapes.push(Shape.createRandomShape());
       this.shapeOnBoard = new ShapeOnBoard(this.shape, this.board);
       if (!this.shapeOnBoard.canMove(0, 1)) {
-        this.state = GameState.Finished;
-        this.onEvent({ name: "ON_FINISH" });
+        this.setState(GameState.Finished);
       }
     } else {
       this.shapeOnBoard.moveDown();
@@ -124,8 +144,8 @@ export default class Engine {
     return this.level.getLevel();
   }
 
-  getNextShape() {
-    return this.nextShape;
+  getNextShapes() {
+    return this.nextShapes;
   }
 
   moveLeft() {
