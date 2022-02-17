@@ -15,6 +15,10 @@ export default class Score {
       PointsForReducedRows[reducedRows - 1] * (this.level.getLevel() + 1);
   }
 
+  addPoint() {
+    this.score++;
+  }
+
   getPoints() {
     return this.score;
   }

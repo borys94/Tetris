@@ -1,25 +1,26 @@
-import React from "react";
 import styled from "styled-components";
-import { BRICK_SIZE } from "../constants";
 
 type Props = {
   width: number;
   height: number;
+  size: number;
   children?: any;
+  backgroundColor?: string;
 };
 
 const GameBoard = styled.div.attrs<Props>((props) => ({
   style: {
-    width: `${props.width * BRICK_SIZE}px`,
-    height: `${props.height * BRICK_SIZE}px`,
+    width: `${props.width * props.size}px`,
+    height: `${props.height * props.size}px`,
+    backgroundColor: props.backgroundColor || "white",
   },
 }))`
   width: 100%;
   height: 100%;
-  border: 5px solid #cecbcf;
   display: flex;
   flex-wrap: wrap;
   position: relative;
+  border: 1px solid #aaa;
 `;
 
 const Board = (props: Props) => (

@@ -5,10 +5,11 @@
 
 body {
   margin: 0;
-  font-family: "ms_sans_serif" !important;
+  font-family: system-ui !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #747472;
-  background: url("./assets/background.png");
+  /* background: url("./assets/background.png"); */
+  background-color: #fafafa;
   background-size: 55px;
 }

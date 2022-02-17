@@ -1,10 +1,5 @@
-import styled, { createGlobalStyle, ThemeProvider } from "styled-components";
-import original from "react95/dist/themes/original";
+import styled from "styled-components";
 import Game from "./components/Game";
-
-const GlobalStyles = createGlobalStyle`
-
-`;
 
 const Container = styled.div`
   display: flex;
@@ -26,12 +21,9 @@ const StartContainer = styled.div`
 function App() {
   return (
     <Container className="App">
-      <ThemeProvider theme={original}>
-        <StartContainer>
-          <Game />
-        </StartContainer>
-      </ThemeProvider>
-      <GlobalStyles />
+      <StartContainer>
+        <Game />
+      </StartContainer>
     </Container>
   );
 }
