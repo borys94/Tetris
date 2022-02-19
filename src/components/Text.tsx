@@ -5,6 +5,7 @@ type Props = {
 };
 
 const Text = styled.div<Props>`
+  font-size: 24px;
   ${(props) =>
     props.bold &&
     css`

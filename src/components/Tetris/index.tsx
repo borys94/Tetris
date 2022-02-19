@@ -1,20 +1,11 @@
 import React from "react";
-import styled from "styled-components";
-import { BRICK_SIZE } from "../../constants";
 
-import Brick from "./Brick";
 import Board from "./Board";
-import Result from "./Result";
-import NextShapes from "./NextShapes";
+import Panel from "./Panel";
 import Tetris from "../../tetris";
 
 import { GameState, GameEvent } from "../../types";
-
-export const Container = styled.div`
-  position: relative;
-  width: 100%;
-  height: 100%;
-`;
+import { BRICK_SIZE } from "../../constants";
 
 type Props = {
   width: number;
@@ -24,16 +15,17 @@ type Props = {
   brick?: any;
   backgroundColor?: string;
   backgroundBrick?: any;
-  children: any;
 };
 
 type State = {
   board: number[][];
-  gameState: GameState | null;
+  gameState: GameState;
   reducedRows: number;
   level: number;
   score: number;
   nextShapes: any[];
+  menu: boolean;
+  rowsToRemove: number[];
 };
 
 export default class TetrisGame extends React.Component<Props, State> {
@@ -41,11 +33,13 @@ export default class TetrisGame extends React.Component<Props, State> {
 
   state = {
     board: [[]],
-    gameState: null,
+    gameState: GameState.NotReady,
     reducedRows: 0,
     level: 0,
     score: 0,
     nextShapes: [],
+    rowsToRemove: [],
+    menu: true,
   };
 
   componentDidMount() {
@@ -57,25 +51,35 @@ export default class TetrisGame extends React.Component<Props, State> {
     });
   }
 
-  startNewGame() {
+  startNewGame = () => {
     if (this.tetris) {
       this.tetris.startNewGame();
-      this.props.onSetGameState(this.tetris.getState());
+      this.setState({ menu: false });
     }
-  }
+  };
+
+  closeMenu = () => {
+    if (this.tetris) {
+      this.unPause();
+      this.setState({ menu: false });
+    }
+  };
 
   pause = () => {
     if (this.tetris) {
       this.tetris.pause();
-      this.props.onSetGameState(this.tetris.getState());
     }
   };
 
   unPause = () => {
     if (this.tetris) {
       this.tetris.unPause();
-      this.props.onSetGameState(this.tetris.getState());
     }
+  };
+
+  openMenu = () => {
+    this.pause();
+    this.setState({ menu: true });
   };
 
   onEvent = (gameEvent: GameEvent) => {
@@ -83,6 +87,9 @@ export default class TetrisGame extends React.Component<Props, State> {
       this.setState({ board: gameEvent.data });
     } else if (gameEvent.name === "ON_SET_GAME_STATE") {
       this.setState({ gameState: gameEvent.data });
+      if (gameEvent.data === GameState.Finished) {
+        this.setState({ menu: true });
+      }
     } else if (gameEvent.name === "ON_REDUCED_ROWS_CHANGE") {
       this.setState({ reducedRows: gameEvent.data });
     } else if (gameEvent.name === "ON_LEVEL_CHANGE") {
@@ -94,74 +101,28 @@ export default class TetrisGame extends React.Component<Props, State> {
     }
   };
 
-  renderBoard() {
-    return this.state.board.map((row, y) => {
-      return row.map(
-        (color, x) =>
-          (color && (
-            <Brick
-              key={y + row.length + x}
-              color={color}
-              x={x}
-              y={y}
-              size={this.props.size || BRICK_SIZE}
-              styles={this.props.brick}
-            />
-          )) ||
-          null
-      );
-    });
-  }
-
-  renderBackground() {
-    return this.state.board.map((row, y) => {
-      return row.map((color, x) => (
-        <Brick
-          key={y + row.length + x}
-          color={color}
-          x={x}
-          y={y}
-          size={this.props.size || BRICK_SIZE}
-          styles={{
-            boxSizing: "content-box",
-            backgroundColor: "white",
-            ...this.props.backgroundBrick,
-          }}
-        />
-      ));
-    });
-  }
-
   render() {
-    return this.props.children({
-      score: this.state.score,
-      level: this.state.level,
-      reducedRows: this.state.reducedRows,
-      board: this.state.board,
-      Board: () => (
+    return (
+      <div style={{ display: "flex" }}>
         <Board
-          backgroundColor={this.props.backgroundColor}
           width={this.props.width}
           height={this.props.height}
-          size={this.props.size || BRICK_SIZE}
-        >
-          <Container>
-            {this.renderBackground()}
-            {this.renderBoard()}
-          </Container>
-        </Board>
-      ),
-      Result: () => (
-        <Result
+          size={BRICK_SIZE}
+          startNewGame={this.startNewGame}
+          closeMenu={this.closeMenu}
           score={this.state.score}
-          shapes={this.state.nextShapes}
+          gameState={this.state.gameState}
+          board={this.state.board}
+          menu={this.state.menu}
+        />
+        <Panel
+          score={this.state.score}
           level={this.state.level}
           reducedRows={this.state.reducedRows}
+          nextShapes={this.state.nextShapes}
+          openMenu={this.openMenu}
         />
-      ),
-      NextShapes: () => (
-        <NextShapes shapes={this.state.nextShapes} styles={this.props.brick} />
-      ),
-    });
+      </div>
+    );
   }
 }

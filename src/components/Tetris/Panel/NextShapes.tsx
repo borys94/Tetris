@@ -1,30 +1,29 @@
 import styled from "styled-components";
 
-import Shape from "../../tetris/Shape";
-import Brick from "./Brick";
+import Shape from "../../../tetris/Shape";
+import Brick from "../Brick";
+import Text from "../../Text";
 
 const BRICK_SIZE = 20;
 
 const Content = styled.div`
   min-height: 260px;
-  border: 1px solid #aaa;
-  margin: 10px;
+  padding: 10px 0;
 `;
 
 const ShapeContainer = styled.div`
   padding-top: ${BRICK_SIZE}px;
   padding-left: ${BRICK_SIZE}px;
   position: relative;
+  height: 260px;
 `;
 
 type Props = {
   shapes: Shape[];
-  styles: any;
 };
 
 type ShapeComponentProps = {
   shape: Shape;
-  styles: any;
 };
 
 const ShapeComponent = (props: ShapeComponentProps) => {
@@ -55,9 +54,8 @@ const ShapeComponent = (props: ShapeComponentProps) => {
               key={y * row.length + x}
               x={x - minX}
               y={y}
-              color={color as never}
-              size={BRICK_SIZE}
-              styles={props.styles}
+              colorIndex={color}
+              scale={0.5}
             />
           ) : null
         );
@@ -68,11 +66,11 @@ const ShapeComponent = (props: ShapeComponentProps) => {
 
 const NextShapes = (props: Props) => (
   <Content>
+    <Text>Next</Text>
     <ShapeContainer>
-      {props.shapes &&
-        props.shapes.map((shape, index) => (
-          <ShapeComponent key={index} shape={shape} styles={props.styles} />
-        ))}
+      {props.shapes.map((shape, index) => (
+        <ShapeComponent key={index} shape={shape} />
+      ))}
     </ShapeContainer>
   </Content>
 );

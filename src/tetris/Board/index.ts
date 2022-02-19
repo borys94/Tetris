@@ -68,6 +68,16 @@ export default class Board {
     this.callback(BoardAction.UpdateBoard);
   }
 
+  hardDrop() {
+    let counter = 0;
+    while (!this.shapeOnBoard.colisionInNextStep()) {
+      counter++;
+      this.moveDown();
+    }
+    this.callback(BoardAction.UpdateBoard);
+    return counter;
+  }
+
   getNextShapes() {
     return this.nextShapes;
   }
@@ -100,6 +110,10 @@ export default class Board {
     }
     this.callback(BoardAction.ReduceRows, reducedRows);
     return reducedRows;
+  }
+
+  canMove(x: number, y: number) {
+    return this.shapeOnBoard.canMove(x, y);
   }
 
   private prepareNextShapes() {

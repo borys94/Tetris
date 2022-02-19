@@ -1,15 +1,23 @@
 @font-face {
-  font-family: "ms_sans_serif";
-  src: url("./assets/w95fa.woff");
+  font-family: "Game";
+  src: url("./assets/ChargeVectorBold.ttf");
 }
 
 body {
   margin: 0;
-  font-family: system-ui !important;
+  font-family: "Game" !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #747472;
-  /* background: url("./assets/background.png"); */
   background-color: #fafafa;
   background-size: 55px;
+  color: var(--color-dark);
+}
+
+:root {
+  --color-blue: #0084ff;
+  --color-green: #44bec7;
+  --color-yellow: #ffc300;
+  --color-red: #fa3c4c;
+  --color-purple: #d696bb;
+  --color-dark: #666666;
 }

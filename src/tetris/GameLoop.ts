@@ -16,9 +16,6 @@ export default class GameLoop {
   }
 
   start() {
-    if (this.engine.getState() === GameState.Finished) {
-      return;
-    }
     const timestamp = Date.now();
     if ((timestamp - this.timestamp) / this.getSpeed() >= 1) {
       if (this.engine.getState() === GameState.Started) {
@@ -30,8 +27,8 @@ export default class GameLoop {
   }
 
   private getSpeed() {
-    if (this.engine.isDropActive()) {
-      return 40;
+    if (this.engine.isDropActive() || this.engine.isHardDropActive()) {
+      return 30;
     }
     return SPEED[Math.min(this.engine.getLevel(), SPEED_ARRAY_LENGTH - 1)];
   }

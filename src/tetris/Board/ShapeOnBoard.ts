@@ -122,6 +122,26 @@ export default class ShapeOnBoard {
       }
     }
 
+    if (this.positionY < -2) {
+      return heap;
+    }
+    let counter = 0;
+    while (this.canMove(0, counter + 1)) {
+      counter++;
+    }
+    for (let y in shape) {
+      for (let x in shape[+y]) {
+        if (
+          shape[y][x] &&
+          this.positionX + +x >= 0 &&
+          this.positionY + +y + counter >= 0 &&
+          heap[this.positionY + +y + counter][this.positionX + +x] === 0
+        ) {
+          heap[this.positionY + +y + counter][this.positionX + +x] = -1;
+        }
+      }
+    }
+
     return heap;
   }
 }

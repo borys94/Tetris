@@ -19,6 +19,10 @@ export default class Score {
     this.score++;
   }
 
+  addPointForHardDrop(rows: number) {
+    this.score += rows;
+  }
+
   getPoints() {
     return this.score;
   }

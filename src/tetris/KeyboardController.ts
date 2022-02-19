@@ -1,4 +1,5 @@
 import Engine from "./Engine";
+import { GameState } from "../types";
 
 export default class KeyboardController {
   private engine: Engine;
@@ -22,6 +23,7 @@ export default class KeyboardController {
   };
 
   onKeyDown = (event: any) => {
+    event.preventDefault();
     if (this.keyDown) {
       return;
     }
@@ -34,6 +36,14 @@ export default class KeyboardController {
       this.engine.rotate();
     } else if (event.keyCode === 40) {
       this.startGoingDown();
+    } else if (event.keyCode === 80) {
+      if (this.engine.getState() === GameState.Started) {
+        this.engine.pause();
+      } else if (this.engine.getState() === GameState.Pause) {
+        this.engine.unPause();
+      }
+    } else if (event.keyCode === 32) {
+      this.engine.hardDrop();
     }
   };
 

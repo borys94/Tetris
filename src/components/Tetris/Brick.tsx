@@ -3,40 +3,73 @@ import styled from "styled-components";
 import { BRICK_SIZE, BRICK_COLORS } from "../../constants";
 
 type BrickType = {
-  color: number;
+  colorIndex: number;
   x: number;
   y: number;
-  size?: number;
-  styles?: any;
+  scale: number;
+  removed?: boolean;
+  offsetY?: number;
 };
 
 const Brick = styled.div.attrs<BrickType>((props: BrickType) => ({
   style: {
-    left: `${props.x * (props.size || BRICK_SIZE)}px`,
-    top: `${props.y * (props.size || BRICK_SIZE)}px`,
-    width: `${props.size || BRICK_SIZE}px`,
-    height: `${props.size || BRICK_SIZE}px`,
-    ...(props.color
+    left: `${props.x * (props.scale * BRICK_SIZE)}px`,
+    top: `${(props.y + (props.offsetY || 0)) * (props.scale * BRICK_SIZE)}px`,
+    width: `${BRICK_SIZE}px`,
+    height: `${BRICK_SIZE}px`,
+    transform: `scale(${props.scale})`,
+
+    ...(props.removed
       ? {
-          backgroundColor: `${BRICK_COLORS[props.color - 1]}`,
+          animation: "hide 3000ms",
+          animationIterationCount: "1",
+        }
+      : {}),
+
+    ...(props.offsetY
+      ? {
+          transition: "top 150ms ease-in",
+        }
+      : {}),
+
+    ...(props.colorIndex
+      ? {
+          backgroundColor: `${BRICK_COLORS[props.colorIndex - 1]}`,
         }
       : {
           borderRadius: "0",
           border: "none",
         }),
-    ...(props.styles
+
+    ...(props.colorIndex === -1
       ? {
-          ...props.styles,
+          backgroundColor: `#ccc`,
+          border: "0",
         }
-      : {
-          border: "5px solid #ffffff22",
-          borderBottom: "5px solid #00000055",
-          borderRight: "5px solid #00000055",
-        }),
+      : {}),
   },
 }))<BrickType>`
   position: absolute;
   box-sizing: border-box;
+  border: 5px solid #ffffff22;
+  border-bottom: 5px solid #00000033;
+  border-right: 5px solid #00000033;
+  transition: transform 300ms linear;
+  transform-origin: 50% 100%;
+
+  @keyframes hide {
+    0% {
+      transform: scaleY(1);
+      opacity: 1;
+    }
+    10% {
+      transform: scaleY(0);
+      opacity: 0;
+    }
+    100% {
+      transform: scaleY(0);
+    }
+  }
 `;
 
 export default Brick;

@@ -31,6 +31,10 @@ export default class Tetris {
     this.engine.pause();
   }
 
+  getBoard() {
+    return this.engine.getHeap();
+  }
+
   getState() {
     return this.engine.getState();
   }

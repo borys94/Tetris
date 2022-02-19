@@ -15,6 +15,7 @@ export default class Engine {
 
   private state: GameState = GameState.NotReady;
   private onEvent: (event: GameEvent) => void;
+  private isHardDrop: boolean = false;
 
   constructor({ width, height, onEvent, level }: Required<GameParams>) {
     this.board = new Board(width, height, this.onBoardCallback);
@@ -52,7 +53,9 @@ export default class Engine {
   }
 
   pause() {
-    this.setState(GameState.Pause);
+    if (this.state === GameState.Started) {
+      this.setState(GameState.Pause);
+    }
   }
 
   moveLeft() {
@@ -70,6 +73,18 @@ export default class Engine {
   rotate() {
     if (this.state === GameState.Started) {
       this.board.rotate();
+    }
+  }
+
+  hardDrop() {
+    if (this.state === GameState.Started) {
+      let counter = 0;
+      while (this.board.canMove(0, counter + 1)) {
+        counter++;
+      }
+      this.isHardDrop = true;
+      this.score.addPointForHardDrop(counter);
+      this.updateScore();
     }
   }
 
@@ -92,6 +107,10 @@ export default class Engine {
     return this.keyboardController.isDropActive();
   }
 
+  isHardDropActive() {
+    return this.isHardDrop;
+  }
+
   private onBoardCallback = (boardAction: BoardAction, data: any) => {
     if (boardAction === BoardAction.UpdateBoard) {
       this.onUpdateBoard();
@@ -99,6 +118,8 @@ export default class Engine {
       this.setState(GameState.Finished);
     } else if (boardAction === BoardAction.ReduceRows) {
       this.onReducedRows(data);
+    } else if (boardAction === BoardAction.ShapeAdded) {
+      this.isHardDrop = false;
     }
   };
 
@@ -120,6 +141,10 @@ export default class Engine {
 
   private onUpdateBoard() {
     this.onEvent({ name: "UPDATE_BOARD", data: this.board.getHeap() });
+  }
+
+  getHeap() {
+    return this.board.getHeap();
   }
 
   private updateScore() {

@@ -1,7 +1,6 @@
 import React from "react";
 import styled from "styled-components";
 
-import Menu from "./Menu";
 import Tetris from "./Tetris";
 
 import { GameState } from "../types";
@@ -65,30 +64,13 @@ class Game extends React.Component<{}, State> {
   render() {
     return (
       <Container>
-        <Menu
-          startNewGame={this.startNewGame}
-          unPause={this.unPause}
-          pause={this.pause}
-          canPause={this.state.gameState === GameState.Started}
-          canStart={this.state.gameState === GameState.Pause}
-        />
         <GameContainer>
           <Tetris
             ref={this.tetris}
             width={10}
             height={16}
             onSetGameState={this.onSetGameState}
-          >
-            {({ Board, Result, NextShapes }): any => (
-              <div style={{ display: "flex" }}>
-                <Board />
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <Result />
-                  <NextShapes />
-                </div>
-              </div>
-            )}
-          </Tetris>
+          />
         </GameContainer>
       </Container>
     );
