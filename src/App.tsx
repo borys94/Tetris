@@ -1,5 +1,4 @@
 import styled from "styled-components";
-
 import Game from "./components/Game";
 
 const Container = styled.div`

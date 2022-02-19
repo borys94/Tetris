@@ -1,8 +1,16 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
-const Text = styled.div`
-  padding: 10px 20px;
-  height: 40px;
+type Props = {
+  bold?: boolean;
+};
+
+const Text = styled.div<Props>`
+  font-size: 24px;
+  ${(props) =>
+    props.bold &&
+    css`
+      font-weight: bold;
+    `}
 `;
 
 export default Text;
