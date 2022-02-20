@@ -1,35 +1,32 @@
 import Shape from "../Shape";
 import ShapeOnBoard from "./ShapeOnBoard";
 import copy from "../../helpers/copy";
+import Eventing from "../Eventing";
 
 const NEXT_SHAPES_COUNT = 4;
 
-export enum BoardAction {
-  GameOver,
-  ColisionInNextStep,
-  ShapeAdded,
-  ReduceRows,
-  UpdateBoard,
+interface Action {
+  gameOver: undefined;
+  updateBoard: number[][];
+  updateShape: number[][];
+  reducedRows: number[];
+  shapeAdded: undefined;
+  moveShapeDown: undefined;
+  rotate: boolean;
+  nextShapes: number[][][];
+  badMove;
 }
 
-type Callback = (action: BoardAction, data?: any) => void;
-
-export default class Board {
-  heap: number[][];
+export default class Board extends Eventing<Action> {
+  private heap: number[][];
 
   private shape: Shape;
   private shapeOnBoard: ShapeOnBoard;
   private nextShapes: Shape[] = [];
 
-  private callback: Callback;
-
-  constructor(
-    private width: number,
-    private height: number,
-    callback: Callback
-  ) {
+  constructor(private width: number, private height: number) {
+    super();
     this.heap = new Array(this.height).fill(new Array(this.width).fill(0));
-    this.callback = callback;
 
     this.shape = Shape.createRandomShape();
     this.shapeOnBoard = new ShapeOnBoard(this.shape, this);
@@ -37,53 +34,60 @@ export default class Board {
   }
 
   nextStep() {
-    this.tryReduce();
     if (this.shapeOnBoard.colisionInNextStep()) {
       this.addShapeToBoard();
       this.addNextShape();
       this.updateShapeOnBoard();
+      this.tryReduce();
+      this.trigger("updateBoard", this.getHeap());
     } else {
+      this.trigger("moveShapeDown");
+      this.trigger("updateBoard", this.getHeap());
       this.moveDown();
     }
-    this.callback(BoardAction.UpdateBoard);
+  }
+
+  onUpdateShape = () => {
+    this.trigger("updateShape", this.shapeOnBoard.getShapeOnEmptyBoard());
+  };
+
+  getShapeOnEmptyBoard() {
+    return this.shapeOnBoard.getShapeOnEmptyBoard();
   }
 
   moveDown() {
     this.shapeOnBoard.moveDown();
-    this.callback(BoardAction.UpdateBoard);
+    this.trigger("updateShape", this.shapeOnBoard.getShapeOnEmptyBoard());
   }
 
-  moveLeft() {
-    this.shapeOnBoard.moveLeft();
-    this.callback(BoardAction.UpdateBoard);
+  moveLeft(): boolean {
+    const result = this.shapeOnBoard.moveLeft();
+    if (!result) {
+      this.trigger("badMove");
+    } else {
+      this.onUpdateShape();
+    }
+    return result;
   }
 
-  moveRight() {
-    this.shapeOnBoard.moveRight();
-    this.callback(BoardAction.UpdateBoard);
+  moveRight(): boolean {
+    const result = this.shapeOnBoard.moveRight();
+    if (!result) {
+      this.trigger("badMove");
+    } else {
+      this.onUpdateShape();
+    }
+    return result;
   }
 
   rotate() {
-    this.shapeOnBoard.rotate();
-    this.callback(BoardAction.UpdateBoard);
-  }
-
-  hardDrop() {
-    let counter = 0;
-    while (!this.shapeOnBoard.colisionInNextStep()) {
-      counter++;
-      this.moveDown();
-    }
-    this.callback(BoardAction.UpdateBoard);
-    return counter;
+    const success = this.shapeOnBoard.rotate();
+    this.trigger("rotate", success);
+    this.onUpdateShape();
   }
 
   getNextShapes() {
-    return this.nextShapes;
-  }
-
-  getHeap(): number[][] {
-    return copy(this.shapeOnBoard.getHeap());
+    return this.nextShapes.map((shape) => shape.getPositions());
   }
 
   getWidth() {
@@ -95,7 +99,7 @@ export default class Board {
   }
 
   tryReduce() {
-    let reducedRows = 0;
+    let reducedRows: number[] = [];
     for (let y in this.heap) {
       let allInRow = true;
       for (let x in this.heap[+y]) {
@@ -105,10 +109,16 @@ export default class Board {
       }
       if (allInRow) {
         this.reduceLine(+y);
-        reducedRows++;
+        reducedRows.push(+y);
       }
     }
-    this.callback(BoardAction.ReduceRows, reducedRows);
+    if (reducedRows.length) {
+      this.trigger("reducedRows", reducedRows);
+      this.trigger("updateBoard", this.getHeap());
+
+      this.onUpdateShape();
+    }
+
     return reducedRows;
   }
 
@@ -124,19 +134,23 @@ export default class Board {
 
   private addShapeToBoard() {
     this.addShape(this.shapeOnBoard);
-    this.callback(BoardAction.ShapeAdded);
+    this.trigger("shapeAdded");
   }
 
   private addNextShape() {
     this.shape = this.nextShapes[0];
     this.nextShapes.shift();
     this.nextShapes.push(Shape.createRandomShape());
+    this.trigger(
+      "nextShapes",
+      this.nextShapes.map((shape) => shape.getPositions())
+    );
   }
 
   private updateShapeOnBoard() {
     this.shapeOnBoard = new ShapeOnBoard(this.shape, this);
     if (!this.shapeOnBoard.canMove(0, 1)) {
-      this.callback(BoardAction.GameOver);
+      this.trigger("gameOver");
     }
   }
 
@@ -160,5 +174,9 @@ export default class Board {
     heap.splice(line, 1);
     heap = [new Array(this.width).fill(0), ...heap];
     this.heap = heap;
+  }
+
+  getHeap() {
+    return this.heap;
   }
 }

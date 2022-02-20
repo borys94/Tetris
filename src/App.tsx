@@ -21,6 +21,7 @@ const StartContainer = styled.div`
 function App() {
   return (
     <Container className="App">
+      {/* <About /> */}
       <StartContainer>
         <Game />
       </StartContainer>

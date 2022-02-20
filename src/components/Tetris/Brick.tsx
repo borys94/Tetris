@@ -21,8 +21,7 @@ const Brick = styled.div.attrs<BrickType>((props: BrickType) => ({
 
     ...(props.removed
       ? {
-          animation: "hide 3000ms",
-          animationIterationCount: "1",
+          animation: "hide 1500ms",
         }
       : {}),
 
@@ -66,8 +65,10 @@ const Brick = styled.div.attrs<BrickType>((props: BrickType) => ({
       transform: scaleY(0);
       opacity: 0;
     }
+
     100% {
       transform: scaleY(0);
+      opacity: 0;
     }
   }
 `;

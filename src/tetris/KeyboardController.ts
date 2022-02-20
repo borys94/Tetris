@@ -13,20 +13,14 @@ export default class KeyboardController {
   }
 
   onKeyUp = (event: any) => {
-    if (!this.keyDown) {
-      return;
-    }
-    this.keyDown = false;
     if (event.keyCode === 40) {
+      this.keyDown = false;
       this.stopGoingDown();
     }
   };
 
   onKeyDown = (event: any) => {
     event.preventDefault();
-    if (this.keyDown) {
-      return;
-    }
     this.keyDown = true;
     if (event.keyCode === 37) {
       this.engine.moveLeft();
