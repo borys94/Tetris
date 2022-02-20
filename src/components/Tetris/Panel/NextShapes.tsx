@@ -1,6 +1,5 @@
 import styled from "styled-components";
 
-import Shape from "../../../tetris/Shape";
 import Brick from "../Brick";
 import Text from "../../Text";
 
@@ -19,17 +18,15 @@ const ShapeContainer = styled.div`
 `;
 
 type Props = {
-  shapes: Shape[];
+  shapes: number[][][];
 };
 
 type ShapeComponentProps = {
-  shape: Shape;
+  shape: number[][];
 };
 
 const ShapeComponent = (props: ShapeComponentProps) => {
-  const positions = props.shape
-    .getPositions()
-    .filter((row) => row.find((color) => color));
+  const positions = props.shape.filter((row) => row.find((color) => color));
   let minX = 5;
   let maxX = 0;
   positions.forEach((row, y) => {
