@@ -2,6 +2,7 @@ import React from "react";
 
 import Brick from "../Brick";
 import Tetris from "../../../tetris";
+import equalArrays from "../../../helpers/equalArrays";
 
 type Props = {
   tetris: Tetris;
@@ -38,6 +39,13 @@ class Board extends React.Component<Props, State> {
       this.animation = false;
     }, 300);
   };
+
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    return (
+      !equalArrays(this.state.board, nextState.board) ||
+      !equalArrays(this.state.rowsToRemove, nextState.rowsToRemove)
+    );
+  }
 
   onUpdateBoard = (board: number[][]) => {
     if (!this.animation) {

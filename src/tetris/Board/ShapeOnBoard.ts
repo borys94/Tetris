@@ -1,5 +1,6 @@
 import Shape from "../Shape";
 import Board from "./";
+import copy from "../../helpers/copy";
 
 export default class ShapeOnBoard {
   private positionX: number;
@@ -144,7 +145,7 @@ export default class ShapeOnBoard {
   }
 
   getHeap() {
-    const heap = this.board.getHeap();
+    const heap = copy(this.board.getHeap());
     const shape = this.shape.getPositions();
 
     for (let y in shape) {
