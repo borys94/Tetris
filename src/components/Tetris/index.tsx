@@ -4,65 +4,73 @@ import Board from "./Board";
 import Panel from "./Panel";
 import Tetris from "../../tetris";
 
-import { GameState, GameEvent } from "../../types";
-import { BRICK_SIZE } from "../../constants";
-
-type Props = {
-  width: number;
-  height: number;
-  onSetGameState: (state: GameState) => void;
-  size?: number;
-  brick?: any;
-  backgroundColor?: string;
-  backgroundBrick?: any;
-};
+import { GameState } from "../../types";
+import { BOARD_HEIGHT, BOARD_WIDTH } from "../../constants";
 
 type State = {
-  board: number[][];
   gameState: GameState;
   reducedRows: number;
   level: number;
   score: number;
-  nextShapes: any[];
+  nextShapes: number[][][];
   menu: boolean;
-  rowsToRemove: number[];
 };
 
-export default class TetrisGame extends React.Component<Props, State> {
-  tetris: Tetris | null = null;
+export default class TetrisGame extends React.Component<{}, State> {
+  tetris: Tetris;
 
   state = {
-    board: [[]],
     gameState: GameState.NotReady,
     reducedRows: 0,
     level: 0,
     score: 0,
     nextShapes: [],
-    rowsToRemove: [],
     menu: true,
   };
 
-  componentDidMount() {
+  constructor(props: {}) {
+    super(props);
     this.tetris = new Tetris({
-      width: this.props.width,
-      height: this.props.height,
+      width: BOARD_WIDTH,
+      height: BOARD_HEIGHT,
       level: this.state.level,
-      onEvent: this.onEvent,
     });
+    this.tetris.on("reducedRows", this.onReducedRows);
+    this.tetris.on("level", (level: number) => this.setState({ level }));
+    this.tetris.on("score", (score: number) => this.setState({ score }));
+    this.tetris.on("nextShapes", (nextShapes: number[][][]) =>
+      this.setState({ nextShapes })
+    );
+    this.tetris.on("state", this.onSetGameState);
   }
+
+  onReducedRows = (reducedRows: number[]) => {
+    this.setState({ reducedRows: this.state.reducedRows + reducedRows.length });
+  };
+
+  onSetGameState = (gameState: GameState) => {
+    this.setState({ gameState });
+
+    if (gameState === GameState.Pause) {
+      this.openMenu();
+    } else if (gameState === GameState.Started) {
+      this.closeMenu();
+    } else if (gameState === GameState.Finished) {
+      this.openMenu();
+    }
+  };
 
   startNewGame = () => {
     if (this.tetris) {
       this.tetris.startNewGame();
-      this.setState({ menu: false });
     }
   };
 
   closeMenu = () => {
-    if (this.tetris) {
+    if (this.state.gameState === GameState.Pause) {
       this.unPause();
-      this.setState({ menu: false });
     }
+    this.setState({ menu: false });
   };
 
   pause = () => {
@@ -78,42 +86,19 @@ export default class TetrisGame extends React.Component<Props, State> {
   };
 
   openMenu = () => {
-    this.pause();
+    this.tetris.pause();
     this.setState({ menu: true });
-  };
-
-  onEvent = (gameEvent: GameEvent) => {
-    if (gameEvent.name === "UPDATE_BOARD") {
-      this.setState({ board: gameEvent.data });
-    } else if (gameEvent.name === "ON_SET_GAME_STATE") {
-      this.setState({ gameState: gameEvent.data });
-      if (gameEvent.data === GameState.Finished) {
-        this.setState({ menu: true });
-      }
-    } else if (gameEvent.name === "ON_REDUCED_ROWS_CHANGE") {
-      this.setState({ reducedRows: gameEvent.data });
-    } else if (gameEvent.name === "ON_LEVEL_CHANGE") {
-      this.setState({ level: gameEvent.data });
-    } else if (gameEvent.name === "ON_SCORE_CHANGE") {
-      this.setState({ score: gameEvent.data });
-    } else if (gameEvent.name === "ON_NEXT_SHAPES_CHANGE") {
-      this.setState({ nextShapes: gameEvent.data });
-    }
   };
 
   render() {
     return (
       <div style={{ display: "flex" }}>
         <Board
-          width={this.props.width}
-          height={this.props.height}
-          size={BRICK_SIZE}
           startNewGame={this.startNewGame}
           closeMenu={this.closeMenu}
-          score={this.state.score}
           gameState={this.state.gameState}
-          board={this.state.board}
           menu={this.state.menu}
+          tetris={this.tetris}
         />
         <Panel
           score={this.state.score}

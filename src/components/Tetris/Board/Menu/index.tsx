@@ -13,17 +13,17 @@ const Container = styled.div<any>`
   ${(props) =>
     props.isOpen
       ? css`
-          opacity: 1;
+          transform: translateX(0);
         `
       : css`
-          opacity: 0;
+          transform: translateX(-500px);
           pointer-events: none;
         `}
 
   overflow: hidden;
   display: flex;
 
-  transition: opacity 150ms linear;
+  transition: opacity, transform 150ms ease-out;
   background-color: #fffa;
   position: absolute;
   width: 100%;
@@ -125,16 +125,21 @@ type Props = {
   gameState: GameState;
 };
 
+type State = {
+  menuTab: MenuTab;
+};
+
 enum MenuTab {
   Main,
   Navigation,
   GameOver,
 }
 
-export default class Menu extends React.Component<Props> {
+export default class Menu extends React.Component<Props, State> {
   state = {
     menuTab: MenuTab.Main,
   };
+
   renderStart() {
     return (
       <div

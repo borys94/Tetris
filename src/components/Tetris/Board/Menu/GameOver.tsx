@@ -11,13 +11,27 @@ const Container = styled.div`
 
   h1 {
     font-size: 50px;
+    margin-bottom: 0;
+  }
+`;
+
+const ResultContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-bottom: 80px;
+
+  > div {
+    margin: auto 0;
   }
 
-  p {
+  > div:first-of-type {
     font-size: 24px;
-    span {
-      color: var(--color-purple);
-    }
+    margin-right: 20px;
+  }
+
+  > div:last-of-type {
+    font-size: 45px;
+    color: var(--color-purple);
   }
 `;
 
@@ -31,9 +45,10 @@ export default class GameOver extends React.Component<Props> {
     return (
       <Container>
         <h1>Game Over</h1>
-        <p>
-          Result: <span>{this.props.score}</span>
-        </p>
+        <ResultContainer>
+          <div>Result</div>
+          <div>{this.props.score}</div>
+        </ResultContainer>
         <Button onClick={this.props.startNewGame}>Try again</Button>
       </Container>
     );

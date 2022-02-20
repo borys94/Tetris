@@ -1,6 +1,5 @@
 import Shape from "../Shape";
 import Board from "./";
-import copy from "../../helpers/copy";
 
 export default class ShapeOnBoard {
   private positionX: number;
@@ -37,7 +36,7 @@ export default class ShapeOnBoard {
 
   rotate() {
     if (!this.canRotate()) {
-      return;
+      return false;
     }
 
     if (!this.canMove(0, 0, true)) {
@@ -48,6 +47,7 @@ export default class ShapeOnBoard {
       }
     }
     this.shape.rotate();
+    return true;
   }
 
   moveDown() {
@@ -56,32 +56,24 @@ export default class ShapeOnBoard {
     }
   }
 
-  moveToBottom() {
-    let index = 0;
-    while (true) {
-      if (this.canMove(0, index)) {
-        index++;
-      } else {
-        this.positionY += index - 1;
-        break;
-      }
-    }
-  }
-
   moveLeft() {
-    if (this.canMove(-1, 0)) {
+    const canMove = this.canMove(-1, 0);
+    if (canMove) {
       this.positionX--;
     }
+    return canMove;
   }
 
   moveRight() {
-    if (this.canMove(1, 0)) {
+    const canMove = this.canMove(1, 0);
+    if (canMove) {
       this.positionX++;
     }
+    return canMove;
   }
 
   canMove(xShift: number, yShift: number, rotated = false) {
-    const heap = this.board.heap;
+    const heap = this.board.getHeap();
     const shape = rotated
       ? this.shape.getRotatedShape()
       : this.shape.getPositions();
@@ -106,8 +98,53 @@ export default class ShapeOnBoard {
     return true;
   }
 
+  getShapeOnEmptyBoard(): number[][] {
+    const heap: number[][] = new Array(this.board.getHeight())
+      .fill([])
+      .map((row) => new Array(this.board.getWidth()).fill(0));
+    const shape = this.shape.getPositions();
+
+    for (let y in shape) {
+      for (let x in shape[+y]) {
+        if (
+          shape[y][x] &&
+          this.positionX + +x >= 0 &&
+          this.positionY + +y >= 0
+        ) {
+          heap[this.positionY + +y][this.positionX + +x] = shape[y][x];
+        }
+      }
+    }
+
+    if (this.positionY < -2) {
+      return heap;
+    }
+    let counter = 0;
+    while (this.canMove(0, counter + 1)) {
+      counter++;
+    }
+    for (let y in shape) {
+      for (let x in shape[+y]) {
+        if (
+          shape[y][x] &&
+          this.positionX + +x >= 0 &&
+          this.positionY + +y + counter >= 0 &&
+          heap[this.positionY + +y + counter][this.positionX + +x] === 0
+        ) {
+          heap[this.positionY + +y + counter][this.positionX + +x] = -1;
+        }
+      }
+    }
+
+    return heap;
+  }
+
+  getBoardWithoutShape(): number[][] {
+    return this.board.getHeap();
+  }
+
   getHeap() {
-    const heap = copy(this.board.heap) as number[][];
+    const heap = this.board.getHeap();
     const shape = this.shape.getPositions();
 
     for (let y in shape) {

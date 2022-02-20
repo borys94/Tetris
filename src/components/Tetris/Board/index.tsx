@@ -1,132 +1,102 @@
 import React from "react";
-import styled from "styled-components";
+import styled, { Keyframes, css } from "styled-components";
 
 import Menu from "./Menu";
-import Brick from "../Brick";
+import Shape from "./Shape";
+import BoardWithoutShape from "./BoardWithoutShape";
+import ScoreOnBoard from "./ScoreOnBoard";
 import { GameState } from "../../../types";
-import copy from "../../../helpers/copy";
+import Tetris from "../../../tetris";
+import { shakeLeft, shakeRight, shakeDown } from "../../keyframes";
+import { BRICK_SIZE, BOARD_HEIGHT, BOARD_WIDTH } from "../../../constants";
 
 const Container = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
+  overflow: hidden;
 `;
 
-const GameBoard = styled.div.attrs<Props>((props) => ({
-  style: {
-    width: `${props.width * props.size}px`,
-    height: `${props.height * props.size}px`,
-  },
-}))`
+type GameBoardProps = {
+  animationName: Keyframes | null;
+};
+
+const GameBoard = styled.div<GameBoardProps>`
+  width: ${BOARD_WIDTH * BRICK_SIZE}px;
+  height: ${BOARD_HEIGHT * BRICK_SIZE}px;
   background-color: #ddd;
-  width: 100%;
-  height: 100%;
   display: flex;
   flex-wrap: wrap;
   position: relative;
+
+  ${(props) =>
+    props.animationName &&
+    css`
+      animation: ${props.animationName} 300ms;
+    `}
 `;
 
 type Props = {
-  width: number;
-  height: number;
-  size: number;
+  tetris: Tetris;
   startNewGame: () => void;
   closeMenu: () => void;
-  score: number;
   gameState: GameState;
-  board: number[][];
   menu: boolean;
 };
 
 type State = {
-  board: number[][];
-  rowsToRemove: number[];
+  animationName: Keyframes | null;
+  score: number;
 };
 
 class Board extends React.Component<Props, State> {
   state: State = {
-    board: [],
-    rowsToRemove: [],
+    animationName: null,
+    score: 0,
   };
 
-  componentWillReceiveProps(nextProps: Props) {
-    this.onNewBoard(nextProps.board);
+  componentDidMount() {
+    this.props.tetris.on("reducedRows", this.onReducedRows);
+    this.props.tetris.on("moveLeftFailed", this.onMoveLeftFailed);
+    this.props.tetris.on("moveRightFailed", this.onMoveRightFailed);
+    this.props.tetris.on("score", this.onScore);
   }
 
-  onNewBoard(board: number[][]) {
-    const newBoard = copy(board).reverse();
-    const currentBoard = copy(this.state.board).reverse();
+  onScore = (score: number) => {
+    this.setState({ score });
+  };
 
-    let different = false;
-    for (let y in newBoard) {
-      for (let x in newBoard[+y]) {
-        if (!currentBoard[y] || newBoard[y][x] !== currentBoard[y][x]) {
-          different = true;
-        }
-      }
-    }
-    if (!different) {
-      return;
-    }
-    this.setState({ board });
+  onReducedRows = () => {
+    this.setState({ animationName: shakeDown });
+    setTimeout(() => this.setState({ animationName: null }), 300);
+  };
 
-    let rowsToRemove: number[] = [];
-    for (let y in newBoard) {
-      for (let x in newBoard[+y]) {
-        if (newBoard[y][x] === -1) {
-          this.setState({ board, rowsToRemove: [] });
-          return;
-        }
-      }
-    }
+  onMoveLeftFailed = () => {
+    this.setState({ animationName: shakeLeft });
+    setTimeout(() => this.setState({ animationName: null }), 300);
+  };
 
-    for (let y in newBoard) {
-      if (newBoard[y].findIndex((color) => color <= 0) !== -1) {
-        continue;
-      }
-      const row = board.length - +y - 1;
-      rowsToRemove = [...rowsToRemove, row];
-    }
+  onMoveRightFailed = () => {
+    this.setState({ animationName: shakeRight });
+    setTimeout(() => this.setState({ animationName: null }), 300);
+  };
 
-    if (rowsToRemove.length) {
-      this.setState({ rowsToRemove });
-    }
-  }
-
-  renderBoard() {
-    return this.state.board.map((row, y) => {
-      return row.map(
-        (color: number, x) =>
-          (color && (
-            <Brick
-              removed={!!this.state.rowsToRemove.find((row) => row === +y)}
-              offsetY={
-                this.state.rowsToRemove.filter((line) => line > y).length
-              }
-              key={y * row.length + x}
-              colorIndex={color}
-              x={x}
-              y={y}
-              scale={1}
-            />
-          )) ||
-          null
-      );
-    });
-  }
   render() {
     return (
-      <GameBoard {...this.props}>
+      <GameBoard animationName={this.state.animationName}>
         <Container>
-          {this.renderBoard()}
+          <Shape tetris={this.props.tetris} />
+          <BoardWithoutShape tetris={this.props.tetris} />
+
           <Menu
             isOpen={this.props.menu}
-            score={this.props.score}
+            score={this.state.score}
             gameState={this.props.gameState}
             startNewGame={this.props.startNewGame}
             close={this.props.closeMenu}
           />
         </Container>
+        <ScoreOnBoard score={this.state.score} />
       </GameBoard>
     );
   }

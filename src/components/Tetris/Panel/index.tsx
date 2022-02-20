@@ -20,7 +20,7 @@ type Props = {
   reducedRows: number;
   level: number;
   score: number;
-  nextShapes: any[];
+  nextShapes: number[][][];
   openMenu: () => void;
 };
 

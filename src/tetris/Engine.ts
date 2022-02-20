@@ -1,12 +1,29 @@
-import Board, { BoardAction } from "./Board";
+import Board from "./Board";
 import Score from "./Score";
 import Level from "./Level";
 import GameLoop from "./GameLoop";
 import KeyboardController from "./KeyboardController";
+import Eventing from "./Eventing";
 
-import { GameState, GameEvent, GameParams } from "../types";
+import { GameState, GameParams } from "../types";
 
-export default class Engine {
+interface Action {
+  updateBoard: number[][];
+  updateShape: number[][];
+  gameOver: undefined;
+  reducedRows: number[];
+  moveShapeDown: undefined;
+  rotate: boolean;
+  badMove: undefined;
+  moveLeftFailed: undefined;
+  moveRightFailed: undefined;
+  level: number;
+  score: number;
+  nextShapes: number[][][];
+  state: GameState;
+}
+
+export default class Engine extends Eventing<Action> {
   private board: Board;
   private score: Score;
   private level: Level;
@@ -14,30 +31,56 @@ export default class Engine {
   private keyboardController: KeyboardController;
 
   private state: GameState = GameState.NotReady;
-  private onEvent: (event: GameEvent) => void;
   private isHardDrop: boolean = false;
 
-  constructor({ width, height, onEvent, level }: Required<GameParams>) {
-    this.board = new Board(width, height, this.onBoardCallback);
+  constructor({ width, height, level }: Required<GameParams>) {
+    super();
+    this.board = new Board(width, height);
     this.level = new Level(level);
     this.score = new Score(this.level);
+
+    this.board.on("updateBoard", this.onUpdateBoard);
+    this.board.on("updateShape", this.onUpdateShape);
+    this.board.on("reducedRows", this.onReducedRows);
+    this.board.on("gameOver", this.onGameOver);
+    this.board.on("moveShapeDown", this.onMoveShapeDown);
+    this.board.on("rotate", this.onRotate);
+    this.board.on("badMove", this.onBadMove);
+    this.board.on("nextShapes", this.onUpdateNextShapes);
+    this.board.on("shapeAdded", () => (this.isHardDrop = false));
 
     this.gameLoop = new GameLoop(this);
     this.keyboardController = new KeyboardController(this);
 
-    this.onEvent = onEvent;
-    this.setState(GameState.ReadyToStart);
     this.gameLoop.start();
-    this.onUpdateBoard();
     (window as any).engine = this;
   }
 
+  onGameOver = () => {
+    this.setState(GameState.Finished);
+    this.trigger("gameOver");
+  };
+
+  getBoardWithoutShape() {
+    return this.board.getHeap();
+  }
+
+  getShapeOnBoard() {
+    return this.board.getShapeOnEmptyBoard();
+  }
+
   startNewGame() {
-    this.board = new Board(
-      this.board.getWidth(),
-      this.board.getHeight(),
-      this.onBoardCallback
-    );
+    this.board = new Board(this.board.getWidth(), this.board.getHeight());
+    this.board.on("updateBoard", this.onUpdateBoard);
+    this.board.on("updateShape", this.onUpdateShape);
+    this.board.on("reducedRows", this.onReducedRows);
+    this.board.on("gameOver", this.onGameOver);
+    this.board.on("moveShapeDown", this.onMoveShapeDown);
+    this.board.on("rotate", this.onRotate);
+    this.board.on("badMove", this.onBadMove);
+    this.board.on("nextShapes", this.onUpdateNextShapes);
+    this.board.on("shapeAdded", () => (this.isHardDrop = false));
+
     this.level = new Level(this.level.getInitialLevel());
     this.score = new Score(this.level);
 
@@ -45,11 +88,14 @@ export default class Engine {
     this.onUpdateNextShapes();
     this.onLevelChange();
     this.updateScore();
-    this.onReducedRowsChange();
+    this.trigger("updateBoard", this.board.getHeap());
+    this.trigger("updateShape", []);
   }
 
   unPause() {
-    this.setState(GameState.Started);
+    if (this.state === GameState.Pause) {
+      this.setState(GameState.Started);
+    }
   }
 
   pause() {
@@ -60,13 +106,17 @@ export default class Engine {
 
   moveLeft() {
     if (this.state === GameState.Started) {
-      this.board.moveLeft();
+      if (!this.board.moveLeft()) {
+        this.trigger("moveLeftFailed");
+      }
     }
   }
 
   moveRight() {
     if (this.state === GameState.Started) {
-      this.board.moveRight();
+      if (!this.board.moveRight()) {
+        this.trigger("moveRightFailed");
+      }
     }
   }
 
@@ -87,6 +137,18 @@ export default class Engine {
       this.updateScore();
     }
   }
+
+  onMoveShapeDown = () => {
+    this.trigger("moveShapeDown");
+  };
+
+  onRotate = (success: boolean) => {
+    this.trigger("rotate", success);
+  };
+
+  onBadMove = () => {
+    this.trigger("badMove");
+  };
 
   nextStep = () => {
     this.board.nextStep();
@@ -111,66 +173,48 @@ export default class Engine {
     return this.isHardDrop;
   }
 
-  private onBoardCallback = (boardAction: BoardAction, data: any) => {
-    if (boardAction === BoardAction.UpdateBoard) {
-      this.onUpdateBoard();
-    } else if (boardAction === BoardAction.GameOver) {
-      this.setState(GameState.Finished);
-    } else if (boardAction === BoardAction.ReduceRows) {
-      this.onReducedRows(data);
-    } else if (boardAction === BoardAction.ShapeAdded) {
-      this.isHardDrop = false;
-    }
-  };
-
   private addOnePoint() {
     this.score.addPoint();
     this.updateScore();
   }
 
-  private onReducedRows(reducedRows: number) {
-    if (reducedRows) {
-      this.score.addPoints(reducedRows);
-      this.level.addReducedRows(reducedRows);
+  private onReducedRows = (reducedRows: number[]) => {
+    if (reducedRows.length) {
+      this.score.addPoints(reducedRows.length);
+      this.level.addReducedRows(reducedRows.length);
 
       this.onLevelChange();
       this.updateScore();
-      this.onReducedRowsChange();
+      this.trigger("reducedRows", reducedRows);
     }
-  }
+  };
 
-  private onUpdateBoard() {
-    this.onEvent({ name: "UPDATE_BOARD", data: this.board.getHeap() });
-  }
+  private onUpdateBoard = (board: number[][]) => {
+    this.trigger("updateBoard", board);
+  };
+
+  private onUpdateShape = (shapeOnBoard: number[][]) => {
+    this.trigger("updateShape", shapeOnBoard);
+  };
 
   getHeap() {
     return this.board.getHeap();
   }
 
   private updateScore() {
-    this.onEvent({ name: "ON_SCORE_CHANGE", data: this.score.getPoints() });
+    this.trigger("score", this.score.getPoints());
   }
 
-  private onUpdateNextShapes() {
-    this.onEvent({
-      name: "ON_NEXT_SHAPES_CHANGE",
-      data: this.board.getNextShapes(),
-    });
-  }
+  private onUpdateNextShapes = (nextShapes = this.board.getNextShapes()) => {
+    this.trigger("nextShapes", nextShapes);
+  };
 
   private onLevelChange() {
-    this.onEvent({ name: "ON_LEVEL_CHANGE", data: this.level.getLevel() });
-  }
-
-  private onReducedRowsChange() {
-    this.onEvent({
-      name: "ON_REDUCED_ROWS_CHANGE",
-      data: this.level.getReducedRows(),
-    });
+    this.trigger("level", this.level.getLevel());
   }
 
   private setState(state: GameState) {
     this.state = state;
-    this.onEvent({ name: "ON_SET_GAME_STATE", data: state });
+    this.trigger("state", state);
   }
 }
