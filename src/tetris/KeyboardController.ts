@@ -3,7 +3,6 @@ import { GameState } from "../types";
 
 export default class KeyboardController {
   private engine: Engine;
-  private keyDown: boolean = false;
   private arrowDown: boolean = false;
 
   constructor(engine: Engine) {
@@ -12,16 +11,14 @@ export default class KeyboardController {
     window.addEventListener("keyup", this.onKeyUp);
   }
 
-  onKeyUp = (event: any) => {
+  onKeyUp = (event: KeyboardEvent) => {
     if (event.keyCode === 40) {
-      this.keyDown = false;
       this.stopGoingDown();
     }
   };
 
-  onKeyDown = (event: any) => {
+  onKeyDown = (event: KeyboardEvent) => {
     event.preventDefault();
-    this.keyDown = true;
     if (event.keyCode === 37) {
       this.engine.moveLeft();
     } else if (event.keyCode === 39) {

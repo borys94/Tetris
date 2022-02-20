@@ -23,7 +23,7 @@ const Container = styled.div`
 
 type Props = {
   score: number;
-  shapes: any;
+  shapes: number[][][];
   level: number;
   reducedRows: number;
 };

@@ -2,6 +2,7 @@ import Shape from "../Shape";
 import ShapeOnBoard from "./ShapeOnBoard";
 import copy from "../../helpers/copy";
 import Eventing from "../Eventing";
+import { BOARD_HEIGHT, BOARD_WIDTH } from "../../constants";
 
 const NEXT_SHAPES_COUNT = 4;
 
@@ -19,15 +20,13 @@ interface Action {
 
 export default class Board extends Eventing<Action> {
   private heap: number[][];
-
   private shape: Shape;
   private shapeOnBoard: ShapeOnBoard;
   private nextShapes: Shape[] = [];
 
-  constructor(private width: number, private height: number) {
+  constructor() {
     super();
-    this.heap = new Array(this.height).fill(new Array(this.width).fill(0));
-
+    this.heap = new Array(BOARD_HEIGHT).fill(new Array(BOARD_WIDTH).fill(0));
     this.shape = Shape.createRandomShape();
     this.shapeOnBoard = new ShapeOnBoard(this.shape, this);
     this.nextShapes = this.prepareNextShapes();
@@ -41,8 +40,6 @@ export default class Board extends Eventing<Action> {
       this.tryReduce();
       this.trigger("updateBoard", this.getHeap());
     } else {
-      this.trigger("moveShapeDown");
-      this.trigger("updateBoard", this.getHeap());
       this.moveDown();
     }
   }
@@ -56,6 +53,7 @@ export default class Board extends Eventing<Action> {
   }
 
   moveDown() {
+    this.trigger("moveShapeDown");
     this.shapeOnBoard.moveDown();
     this.trigger("updateShape", this.shapeOnBoard.getShapeOnEmptyBoard());
   }
@@ -88,14 +86,6 @@ export default class Board extends Eventing<Action> {
 
   getNextShapes() {
     return this.nextShapes.map((shape) => shape.getPositions());
-  }
-
-  getWidth() {
-    return this.width;
-  }
-
-  getHeight() {
-    return this.height;
   }
 
   tryReduce() {
@@ -172,7 +162,7 @@ export default class Board extends Eventing<Action> {
   private reduceLine(line: number) {
     let heap = copy(this.heap);
     heap.splice(line, 1);
-    heap = [new Array(this.width).fill(0), ...heap];
+    heap = [new Array(BOARD_WIDTH).fill(0), ...heap];
     this.heap = heap;
   }
 
