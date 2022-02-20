@@ -15,9 +15,3 @@ export enum GameState {
   Pause,
   Finished,
 }
-
-export interface GameParams {
-  width?: number;
-  height?: number;
-  level?: number;
-}

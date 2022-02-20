@@ -1,5 +1,5 @@
 export default class Eventing<T> {
-  events: any = {}; // { [key: string]: Callback[] } = {};
+  events: any = {};
 
   on = <K extends keyof T>(
     eventName: K,

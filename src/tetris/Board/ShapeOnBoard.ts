@@ -1,38 +1,18 @@
 import Shape from "../Shape";
 import Board from "./";
-import copy from "../../helpers/copy";
+import { BOARD_HEIGHT, BOARD_WIDTH } from "../../constants";
 
 export default class ShapeOnBoard {
   private positionX: number;
   private positionY: number;
 
   constructor(private shape: Shape, private board: Board) {
-    this.positionX = Math.floor(board.getWidth() / 2) - 2;
+    this.positionX = Math.floor(BOARD_WIDTH / 2) - 2;
     this.positionY = -3;
   }
 
   colisionInNextStep() {
     return !this.canMove(0, 1);
-  }
-
-  getShape() {
-    return this.shape;
-  }
-
-  getPositionX() {
-    return this.positionX;
-  }
-
-  getPositionY() {
-    return this.positionY;
-  }
-
-  canRotate() {
-    return (
-      this.canMove(0, 0, true) ||
-      this.canMove(-1, 0, true) ||
-      this.canMove(1, 0, true)
-    );
   }
 
   rotate() {
@@ -83,10 +63,10 @@ export default class ShapeOnBoard {
       for (let x in shape[+y]) {
         if (
           shape[y][x] &&
-          (this.positionY + +y + yShift >= this.board.getHeight() ||
+          (this.positionY + +y + yShift >= BOARD_HEIGHT ||
             this.positionY + +y + yShift < -3 ||
             this.positionX + +x + xShift < 0 ||
-            this.positionX + +x + xShift >= this.board.getWidth() ||
+            this.positionX + +x + xShift >= BOARD_WIDTH ||
             (this.positionY + +y + yShift >= 0 &&
               heap[this.positionY + +y + yShift][
                 this.positionX + +x + xShift
@@ -100,9 +80,9 @@ export default class ShapeOnBoard {
   }
 
   getShapeOnEmptyBoard(): number[][] {
-    const heap: number[][] = new Array(this.board.getHeight())
+    const heap: number[][] = new Array(BOARD_HEIGHT)
       .fill([])
-      .map((row) => new Array(this.board.getWidth()).fill(0));
+      .map((row) => new Array(BOARD_WIDTH).fill(0));
     const shape = this.shape.getPositions();
 
     for (let y in shape) {
@@ -144,42 +124,23 @@ export default class ShapeOnBoard {
     return this.board.getHeap();
   }
 
-  getHeap() {
-    const heap = copy(this.board.getHeap());
-    const shape = this.shape.getPositions();
+  getShape() {
+    return this.shape;
+  }
 
-    for (let y in shape) {
-      for (let x in shape[+y]) {
-        if (
-          shape[y][x] &&
-          this.positionX + +x >= 0 &&
-          this.positionY + +y >= 0
-        ) {
-          heap[this.positionY + +y][this.positionX + +x] = shape[y][x];
-        }
-      }
-    }
+  getPositionX() {
+    return this.positionX;
+  }
 
-    if (this.positionY < -2) {
-      return heap;
-    }
-    let counter = 0;
-    while (this.canMove(0, counter + 1)) {
-      counter++;
-    }
-    for (let y in shape) {
-      for (let x in shape[+y]) {
-        if (
-          shape[y][x] &&
-          this.positionX + +x >= 0 &&
-          this.positionY + +y + counter >= 0 &&
-          heap[this.positionY + +y + counter][this.positionX + +x] === 0
-        ) {
-          heap[this.positionY + +y + counter][this.positionX + +x] = -1;
-        }
-      }
-    }
+  getPositionY() {
+    return this.positionY;
+  }
 
-    return heap;
+  private canRotate() {
+    return (
+      this.canMove(0, 0, true) ||
+      this.canMove(-1, 0, true) ||
+      this.canMove(1, 0, true)
+    );
   }
 }

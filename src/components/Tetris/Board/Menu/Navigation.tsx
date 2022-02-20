@@ -16,7 +16,10 @@ const Container = styled.div`
   }
 `;
 
-const Key = styled.div<any>`
+type KeyProps = {
+  value: string;
+};
+const Key = styled.div<KeyProps>`
   display: inline-block;
 
   width: 100px;

@@ -5,7 +5,7 @@ import GameLoop from "./GameLoop";
 import KeyboardController from "./KeyboardController";
 import Eventing from "./Eventing";
 
-import { GameState, GameParams } from "../types";
+import { GameState } from "../types";
 
 interface Action {
   updateBoard: number[][];
@@ -14,7 +14,6 @@ interface Action {
   reducedRows: number[];
   moveShapeDown: undefined;
   rotate: boolean;
-  badMove: undefined;
   moveLeftFailed: undefined;
   moveRightFailed: undefined;
   level: number;
@@ -33,53 +32,20 @@ export default class Engine extends Eventing<Action> {
   private state: GameState = GameState.NotReady;
   private isHardDrop: boolean = false;
 
-  constructor({ width, height, level }: Required<GameParams>) {
+  constructor() {
     super();
-    this.board = new Board(width, height);
-    this.level = new Level(level);
+    this.board = new Board();
+    this.initBoardEvents();
+    this.level = new Level();
     this.score = new Score(this.level);
-
-    this.board.on("updateBoard", this.onUpdateBoard);
-    this.board.on("updateShape", this.onUpdateShape);
-    this.board.on("reducedRows", this.onReducedRows);
-    this.board.on("gameOver", this.onGameOver);
-    this.board.on("moveShapeDown", this.onMoveShapeDown);
-    this.board.on("rotate", this.onRotate);
-    this.board.on("badMove", this.onBadMove);
-    this.board.on("nextShapes", this.onUpdateNextShapes);
-    this.board.on("shapeAdded", () => (this.isHardDrop = false));
-
     this.gameLoop = new GameLoop(this);
     this.keyboardController = new KeyboardController(this);
-
     this.gameLoop.start();
-    (window as any).engine = this;
-  }
-
-  onGameOver = () => {
-    this.setState(GameState.Finished);
-    this.trigger("gameOver");
-  };
-
-  getBoardWithoutShape() {
-    return this.board.getHeap();
-  }
-
-  getShapeOnBoard() {
-    return this.board.getShapeOnEmptyBoard();
   }
 
   startNewGame() {
-    this.board = new Board(this.board.getWidth(), this.board.getHeight());
-    this.board.on("updateBoard", this.onUpdateBoard);
-    this.board.on("updateShape", this.onUpdateShape);
-    this.board.on("reducedRows", this.onReducedRows);
-    this.board.on("gameOver", this.onGameOver);
-    this.board.on("moveShapeDown", this.onMoveShapeDown);
-    this.board.on("rotate", this.onRotate);
-    this.board.on("badMove", this.onBadMove);
-    this.board.on("nextShapes", this.onUpdateNextShapes);
-    this.board.on("shapeAdded", () => (this.isHardDrop = false));
+    this.board = new Board();
+    this.initBoardEvents();
 
     this.level = new Level(this.level.getInitialLevel());
     this.score = new Score(this.level);
@@ -146,10 +112,6 @@ export default class Engine extends Eventing<Action> {
     this.trigger("rotate", success);
   };
 
-  onBadMove = () => {
-    this.trigger("badMove");
-  };
-
   nextStep = () => {
     this.board.nextStep();
     if (this.isDropActive()) {
@@ -165,6 +127,18 @@ export default class Engine extends Eventing<Action> {
     return this.level.getLevel();
   }
 
+  getHeap() {
+    return this.board.getHeap();
+  }
+
+  getBoardWithoutShape() {
+    return this.getHeap();
+  }
+
+  getShapeOnBoard() {
+    return this.board.getShapeOnEmptyBoard();
+  }
+
   isDropActive() {
     return this.keyboardController.isDropActive();
   }
@@ -172,6 +146,22 @@ export default class Engine extends Eventing<Action> {
   isHardDropActive() {
     return this.isHardDrop;
   }
+
+  private initBoardEvents() {
+    this.board.on("updateBoard", this.onUpdateBoard);
+    this.board.on("updateShape", this.onUpdateShape);
+    this.board.on("reducedRows", this.onReducedRows);
+    this.board.on("gameOver", this.onGameOver);
+    this.board.on("moveShapeDown", this.onMoveShapeDown);
+    this.board.on("rotate", this.onRotate);
+    this.board.on("nextShapes", this.onUpdateNextShapes);
+    this.board.on("shapeAdded", () => (this.isHardDrop = false));
+  }
+
+  private onGameOver = () => {
+    this.setState(GameState.Finished);
+    this.trigger("gameOver");
+  };
 
   private addOnePoint() {
     this.score.addPoint();
@@ -196,10 +186,6 @@ export default class Engine extends Eventing<Action> {
   private onUpdateShape = (shapeOnBoard: number[][]) => {
     this.trigger("updateShape", shapeOnBoard);
   };
-
-  getHeap() {
-    return this.board.getHeap();
-  }
 
   private updateScore() {
     this.trigger("score", this.score.getPoints());

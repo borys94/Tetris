@@ -5,7 +5,6 @@ import Panel from "./Panel";
 import Tetris from "../../tetris";
 
 import { GameState } from "../../types";
-import { BOARD_HEIGHT, BOARD_WIDTH } from "../../constants";
 
 type State = {
   gameState: GameState;
@@ -30,11 +29,7 @@ export default class TetrisGame extends React.Component<{}, State> {
 
   constructor(props: {}) {
     super(props);
-    this.tetris = new Tetris({
-      width: BOARD_WIDTH,
-      height: BOARD_HEIGHT,
-      level: this.state.level,
-    });
+    this.tetris = new Tetris();
     this.tetris.on("reducedRows", this.onReducedRows);
     this.tetris.on("level", (level: number) => this.setState({ level }));
     this.tetris.on("score", (score: number) => this.setState({ score }));

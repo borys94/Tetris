@@ -27,7 +27,9 @@ export default class GameLoop {
   }
 
   private getSpeed() {
-    if (this.engine.isDropActive() || this.engine.isHardDropActive()) {
+    if (this.engine.isHardDropActive()) {
+      return 10;
+    } else if (this.engine.isDropActive()) {
       return 30;
     }
     return SPEED[Math.min(this.engine.getLevel(), SPEED_ARRAY_LENGTH - 1)];
