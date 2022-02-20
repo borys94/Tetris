@@ -3,6 +3,8 @@ import styled from "styled-components";
 
 import Brick from "../Brick";
 import Tetris from "../../../tetris";
+import { BOARD_HEIGHT, BOARD_WIDTH } from "../../../constants";
+import equalArrays from "../../../helpers/equalArrays";
 
 const Container = styled.div`
   position: relative;
@@ -34,15 +36,29 @@ export default class Shape extends React.Component<Props, State> {
     this.props.tetris.on("reducedRows", this.onReducedRows);
   }
 
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    return (
+      !equalArrays(this.state.shapeOnBoard, nextState.shapeOnBoard) ||
+      !equalArrays(this.state.rowsToRemove, nextState.rowsToRemove) ||
+      !equalArrays(
+        this.state.newShapeDuringAnimation,
+        nextState.newShapeDuringAnimation
+      )
+    );
+  }
+
   onUpdateShape = (shapeOnBoard) => {
     if (!this.animation) {
       this.setState({ shapeOnBoard, newShapeDuringAnimation: [] });
-    } else {
+    } else if (!equalArrays(shapeOnBoard, this.state.shapeOnBoard)) {
       this.setState({ newShapeDuringAnimation: shapeOnBoard });
     }
   };
 
   onReducedRows = (reducedRows: number[]) => {
+    if (this.animation) {
+      return;
+    }
     this.animation = true;
     this.setState({ rowsToRemove: reducedRows });
     setTimeout(() => {
@@ -57,32 +73,34 @@ export default class Shape extends React.Component<Props, State> {
 
   render() {
     const { newShapeDuringAnimation, shapeOnBoard } = this.state;
-    let arr: number[][] = [];
-    for (let y in shapeOnBoard) {
-      for (let x in shapeOnBoard[y]) {
-        if (!arr[y]) {
-          arr[y] = [];
-        }
-        arr[y][x] =
-          (newShapeDuringAnimation[y] && newShapeDuringAnimation[y][x]) ||
-          shapeOnBoard[y][x];
-      }
-    }
+
     return (
       <Container>
-        {arr.map((row, y) => {
+        {newShapeDuringAnimation.map((row, y) => {
+          return row.map(
+            (color: number, x) =>
+              (color && (
+                <Brick
+                  key={BOARD_HEIGHT * BOARD_WIDTH + y * row.length + x}
+                  colorIndex={color}
+                  x={x}
+                  y={y}
+                  scale={1}
+                />
+              )) ||
+              null
+          );
+        })}
+        {shapeOnBoard.map((row, y) => {
           return row.map(
             (color: number, x) =>
               (color && (
                 <Brick
                   removed={!!this.state.rowsToRemove.find((row) => row === +y)}
                   offsetY={
-                    newShapeDuringAnimation[y] && newShapeDuringAnimation[y][x]
-                      ? 0
-                      : this.state.rowsToRemove.filter((line) => line > y)
-                          .length
+                    this.state.rowsToRemove.filter((line) => line > y).length
                   }
-                  key={200 + y * row.length + x}
+                  key={BOARD_HEIGHT * BOARD_WIDTH * 2 + y * row.length + x}
                   colorIndex={color}
                   x={x}
                   y={y}
