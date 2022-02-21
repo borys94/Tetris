@@ -1,5 +1,4 @@
 import Engine from "./Engine";
-import { GameState } from "../types";
 
 const SPEED_ARRAY_LENGTH = 20;
 const SPEED = new Array(SPEED_ARRAY_LENGTH)
@@ -9,6 +8,7 @@ const SPEED = new Array(SPEED_ARRAY_LENGTH)
 export default class GameLoop {
   private engine: Engine;
   private timestamp: number = 0;
+  public canGoToNextStep = false;
 
   constructor(engine: Engine) {
     this.engine = engine;
@@ -18,7 +18,7 @@ export default class GameLoop {
   start() {
     const timestamp = Date.now();
     if ((timestamp - this.timestamp) / this.getSpeed() >= 1) {
-      if (this.engine.getState() === GameState.Started) {
+      if (this.canGoToNextStep) {
         this.engine.nextStep();
       }
       this.timestamp = timestamp;
@@ -29,7 +29,7 @@ export default class GameLoop {
   private getSpeed() {
     if (this.engine.isHardDropActive()) {
       return 10;
-    } else if (this.engine.isDropActive()) {
+    } else if (this.engine.isSoftDropActive()) {
       return 30;
     }
     return SPEED[Math.min(this.engine.getLevel(), SPEED_ARRAY_LENGTH - 1)];

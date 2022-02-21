@@ -19,7 +19,7 @@ interface Action {
 }
 
 export default class Board extends Eventing<Action> {
-  private heap: number[][];
+  private heap: number[][]; // board without current shape
   private shape: Shape;
   private shapeOnBoard: ShapeOnBoard;
   private nextShapes: Shape[] = [];
@@ -81,11 +81,17 @@ export default class Board extends Eventing<Action> {
   rotate() {
     const success = this.shapeOnBoard.rotate();
     this.trigger("rotate", success);
-    this.onUpdateShape();
+    if (success) {
+      this.onUpdateShape();
+    }
   }
 
   getNextShapes() {
     return this.nextShapes.map((shape) => shape.getPositions());
+  }
+
+  getHeap() {
+    return this.heap;
   }
 
   tryReduce() {
@@ -164,9 +170,5 @@ export default class Board extends Eventing<Action> {
     heap.splice(line, 1);
     heap = [new Array(BOARD_WIDTH).fill(0), ...heap];
     this.heap = heap;
-  }
-
-  getHeap() {
-    return this.heap;
   }
 }
