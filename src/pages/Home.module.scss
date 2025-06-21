@@ -1,0 +1,20 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.container {
+  text-align: center;
+  @include container-padding;
+}
+
+.title {
+  font-size: $font-size-xl;
+  color: $text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.description {
+  font-size: $font-size-md;
+  color: $text-secondary;
+  max-width: $content-max-width;
+  margin: 0 auto;
+}

@@ -1,0 +1,26 @@
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin container-padding {
+  padding: $spacing-lg;
+}
+
+@mixin card-container {
+  max-width: $content-max-width;
+  margin: 0 auto;
+  padding: $spacing-lg;
+  background-color: $background-white;
+  border-radius: $border-radius-md;
+  box-shadow: $shadow-default;
+}
+
+@mixin hover-transition {
+  transition: all 0.3s ease;
+
+  &:hover {
+    @content;
+  }
+}

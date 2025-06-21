@@ -1,0 +1,46 @@
+@import '../../../styles/variables';
+
+// @use '../../../styles/variables';
+
+.button {
+  font-family: 'Game';
+  border: none;
+  font-weight: 300;
+  color: $color-white;
+  cursor: pointer;
+  outline: none;
+  text-decoration: none !important;
+  display: inline-block;
+  transition: all 150ms;
+  margin: 5px 0;
+  position: relative;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+.button-primary {
+  background-color: $color-green;
+}
+
+.button-secondary {
+  border: 1px solid $color-green;
+  background-color: $color-white;
+  color: $color-green;
+}
+
+.button-sm {
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+.button-md {
+  padding: 12px 24px;
+  font-size: 16px;
+}
+
+.button-lg {
+  padding: 16px 32px;
+  font-size: 18px;
+}

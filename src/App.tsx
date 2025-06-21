@@ -1,32 +1,28 @@
-import styled from "styled-components";
-import Game from "./components/Game";
+import React from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Navigation from './components/Navigation'
+import Home from './pages/Home'
+import Game from './pages/Game/Game'
+import Leaderboard from './pages/Leaderboard'
+import styles from './App.module.scss'
+import Menu from './components/Menu/Menu'
 
-const Container = styled.div`
-  display: flex;
-  margin: auto;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-`;
-
-const StartContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  margin: auto;
-`;
-
-function App() {
+const App: React.FC = () => {
   return (
-    <Container className="App">
-      {/* <About /> */}
-      <StartContainer>
-        <Game />
-      </StartContainer>
-    </Container>
-  );
+    <Router>
+      <div className={styles.app}>
+        <Menu />
+        {/* <Navigation /> */}
+        <main className={styles.main}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/game" element={<Game />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+          </Routes>
+        </main>
+      </div>
+    </Router>
+  )
 }
 
-export default App;
+export default App

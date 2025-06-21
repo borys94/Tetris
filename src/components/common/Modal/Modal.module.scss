@@ -1,0 +1,55 @@
+.container {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.overlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal {
+  position: relative;
+  width: 300px;
+  background-color: white;
+  padding: 16px;
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+}
+
+.modalTitle {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.closeIcon {
+  font-size: 24px;
+  cursor: pointer;
+  transition: 150ms ease-in-out;
+
+  &:hover {
+    transform: scale(1.2);
+  }
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}

@@ -1,0 +1,21 @@
+import type Game from '../Game'
+
+export abstract class Effect {
+  protected elapsed = 0
+  protected progress = 0
+  protected abstract duration: number
+
+  constructor(protected game: Game) {}
+
+  abstract enter(): void
+  abstract render(ctx: CanvasRenderingContext2D): void
+
+  update(deltaTime: number) {
+    this.elapsed += deltaTime
+    this.progress = this.elapsed / this.duration
+  }
+
+  isFinished(): boolean {
+    return this.elapsed >= this.duration
+  }
+}

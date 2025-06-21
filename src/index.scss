@@ -1,0 +1,20 @@
+@import './styles/variables';
+
+@font-face {
+  font-family: 'Game';
+  src: url('./assets/ChargeVectorBold.ttf');
+}
+
+body {
+  margin: 0;
+  font-family: 'Game' !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: $color-white;
+  background-size: 55px;
+  color: $color-dark;
+}
+
+* {
+  box-sizing: border-box;
+}
