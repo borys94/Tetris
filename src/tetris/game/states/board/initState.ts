@@ -10,7 +10,14 @@ class InitState extends State {
   constructor(game: Game) {
     super(game)
 
-    this.newGameButton = new Button('Start', 'primary', config.board.width / 2 - 100, config.board.height / 2 - 25, 200, 50)
+    this.newGameButton = new Button(
+      'Start',
+      'primary',
+      config.board.width / 2 - 100,
+      config.board.height / 2 - 25,
+      200,
+      50
+    )
     // this.addButton(this.newGameButton)
   }
 

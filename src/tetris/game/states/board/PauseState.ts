@@ -13,7 +13,14 @@ export class PauseState extends State {
   constructor(protected game: Game) {
     super(game)
 
-    this.unpauseButton = new Button('Start', 'primary', config.board.width / 2 - 100, config.board.height / 2 - 25, 200, 50)
+    this.unpauseButton = new Button(
+      'Start',
+      'primary',
+      config.board.width / 2 - 100,
+      config.board.height / 2 - 25,
+      200,
+      50
+    )
   }
 
   enter(): void {

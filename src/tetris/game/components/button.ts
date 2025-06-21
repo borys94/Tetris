@@ -41,7 +41,7 @@ class Button {
   // TODO: add opacity animation when unhovered
   update(deltaTime: number) {
     this.opacity = Math.max(
-      1 - this.hoverElapsed / this.hoverDuration * (1 - MIN_OPACITY),
+      1 - (this.hoverElapsed / this.hoverDuration) * (1 - MIN_OPACITY),
       MIN_OPACITY
     )
 
