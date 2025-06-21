@@ -5,10 +5,11 @@ import { GameOverState } from '../states/board/gameOverState'
 import InitState from '../states/board/initState'
 import { PauseState } from '../states/board/pauseState'
 import { PlayingState } from '../states/board/playingState'
-import type { State } from '../states/State'
+import { StateWithButtons, type State } from '../states/State'
 import Panel from './panel'
+import { ResumingGameState } from '../states/board/resumingGame'
 
-export type TetrisStateType = 'init' | 'paused' | 'playing' | 'gameOver'
+export type TetrisStateType = 'init' | 'paused' | 'playing' | 'gameOver' | 'resumingGame'
 
 class BoardPanel extends Panel {
   private currentState: State | undefined
@@ -22,9 +23,14 @@ class BoardPanel extends Panel {
       paused: new PauseState(game),
       playing: new PlayingState(game),
       gameOver: new GameOverState(game),
+      resumingGame: new ResumingGameState(game),
     }
 
     this.setState('init')
+  }
+
+  isPlaying() {
+    return this.currentState instanceof PlayingState
   }
 
   setState(state: TetrisStateType) {
@@ -46,15 +52,21 @@ class BoardPanel extends Panel {
   }
 
   handleClick(x: number, y: number) {
-    this.currentState?.handleClick(x, y)
+    if (this.currentState instanceof StateWithButtons) {
+      this.currentState.handleClick(x, y)
+    }
   }
 
   handleMouseMove(x: number, y: number) {
-    this.currentState?.handleMouseMove(x, y)
+    if (this.currentState instanceof StateWithButtons) {
+      this.currentState.handleMouseMove(x, y)
+    }
   }
 
   handleMouseLeave() {
-    this.currentState?.handleMouseLeave()
+    if (this.currentState instanceof StateWithButtons) {
+      this.currentState.handleMouseLeave()
+    }
   }
 }
 

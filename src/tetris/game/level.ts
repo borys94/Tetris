@@ -18,4 +18,8 @@ export default class Level {
   getReducedRows() {
     return this.reducedRows
   }
+
+  reset() {
+    this.reducedRows = 0
+  }
 }

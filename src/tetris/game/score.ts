@@ -26,4 +26,8 @@ export default class Score {
   addPoints(points: number) {
     this.score += points
   }
+
+  reset() {
+    this.score = 0
+  }
 }

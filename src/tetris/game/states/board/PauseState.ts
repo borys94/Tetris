@@ -1,26 +1,46 @@
 import type Game from '../..'
 import type { InputType } from '../../../inputHandler'
-import { State } from '../State'
+import { StateWithButtons } from '../State'
 import { drawBackground } from '../../../helpers/board'
 import config from '../../../config'
 import Button from '../../components/button'
 
-export class PauseState extends State {
+export class PauseState extends StateWithButtons {
   private elapsed = 0
   private duration = 500
-  private unpauseButton: Button
 
   constructor(protected game: Game) {
     super(game)
 
-    this.unpauseButton = new Button(
-      'Start',
+    const unpauseButton = new Button(
+      'Resume',
       'primary',
       config.board.width / 2 - 100,
       config.board.height / 2 - 25,
       200,
       50
     )
+
+    const newGameButton = new Button(
+      'New Game',
+      'primary',
+      config.board.width / 2 - 100,
+      config.board.height / 2 - 100,
+      200,
+      50
+    )
+
+    this.addButton(unpauseButton)
+    this.addButton(newGameButton)
+
+    unpauseButton.onClick(() => {
+      this.game.setBoardPanelState('resumingGame')
+    })
+
+    newGameButton.onClick(() => {
+      this.game.reset()
+      this.game.setBoardPanelState('resumingGame')
+    })
   }
 
   enter(): void {
@@ -28,9 +48,8 @@ export class PauseState extends State {
   }
 
   update(deltaTime: number) {
+    super.update(deltaTime)
     this.elapsed += deltaTime
-
-    this.unpauseButton.update(deltaTime)
   }
 
   render(ctx: CanvasRenderingContext2D) {
@@ -41,7 +60,7 @@ export class PauseState extends State {
     ctx.fillStyle = '#44bec7'
     ctx.fillText(`Paused`, config.board.width / 2, 200)
 
-    this.unpauseButton.render(ctx)
+    super.renderButtons(ctx)
   }
 
   handleInput(inputs: InputType[]): void {
@@ -50,20 +69,6 @@ export class PauseState extends State {
     }
     if (inputs.includes('Escape') || inputs.includes('KeyP')) {
       this.game.setBoardPanelState('playing')
-    }
-  }
-
-  handleClick(x: number, y: number) {
-    if (this.unpauseButton.inBounds(x, y)) {
-      this.game.setBoardPanelState('playing')
-    }
-  }
-
-  handleMouseMove(x: number, y: number): void {
-    if (this.unpauseButton.inBounds(x, y)) {
-      this.unpauseButton.hover()
-    } else {
-      this.unpauseButton.unhover()
     }
   }
 }

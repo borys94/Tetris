@@ -1,5 +1,5 @@
 import config from '../config'
-import { drawCanvas } from '../helpers/canvas'
+import { drawCanvas, setHighDpiCanvas } from '../helpers/canvas'
 import type { InputType } from '../inputHandler'
 import Board from './board/board'
 import Level from './level'
@@ -22,26 +22,31 @@ class Game {
   private boardPanel: BoardPanel
 
   constructor(canvas: HTMLCanvasElement) {
+    setHighDpiCanvas(canvas, config.board.width + config.rightPanel.width, config.board.height)
     this.canvas = canvas
     this.boardPanel = new BoardPanel(this)
     this.rightPanel = new RightPanel(this)
 
     this.canvas.addEventListener('click', (e) => {
       this.boardPanel.handleClick(e.offsetX, e.offsetY)
+      // TODO: save canvas offset
+      this.rightPanel.handleClick(e.offsetX - config.board.width, e.offsetY)
     })
 
     this.canvas.addEventListener('mousemove', (e) => {
       this.boardPanel.handleMouseMove(e.offsetX, e.offsetY)
+      this.rightPanel.handleMouseMove(e.offsetX - config.board.width, e.offsetY)
     })
 
     this.canvas.addEventListener('mouseleave', () => {
       this.boardPanel.handleMouseLeave()
+      this.rightPanel.handleMouseLeave()
     })
   }
 
   public update(deltaTime: number) {
     this.boardPanel.update(deltaTime)
-    this.rightPanel.update()
+    this.rightPanel.update(deltaTime)
   }
 
   public render(ctx: CanvasRenderingContext2D) {
@@ -60,6 +65,17 @@ class Game {
 
   public setBoardPanelState(state: TetrisStateType) {
     this.boardPanel.setState(state)
+  }
+
+  public reset() {
+    this.board = new Board()
+    this.level = new Level()
+    this.score = new Score(this.level)
+    this.gameTime = 0
+  }
+
+  public isPlaying() {
+    return this.boardPanel.isPlaying()
   }
 }
 

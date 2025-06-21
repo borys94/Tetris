@@ -3,20 +3,44 @@ import { clearCanvas } from '../../helpers/canvas'
 import imageLoader from '../../imageLoader'
 import type Game from '..'
 import Panel from './panel'
+import Button from '../components/button'
 
 class RightPanel extends Panel {
+  private pauseButton: Button
+
   constructor(game: Game) {
     super(game, config.rightPanel.width, config.rightPanel.height)
+
+    this.pauseButton = new Button(
+      'Pause',
+      'primary',
+      0,
+      config.rightPanel.height - config.rightPanel.margin - 50,
+      config.rightPanel.width - config.rightPanel.margin,
+      50
+    )
+
+    this.pauseButton.onClick(() => {
+      this.game.setBoardPanelState('paused')
+    })
   }
 
   render() {
     clearCanvas(this.canvas)
     this.renderNextShapes()
     this.renderStats()
+    this.pauseButton.render(this.ctx)
     return this.canvas
   }
 
-  update() {}
+  update(deltaTime: number) {
+    if (this.game.isPlaying()) {
+      this.pauseButton.setHidden(false)
+    } else {
+      this.pauseButton.setHidden(true)
+    }
+    this.pauseButton.update(deltaTime)
+  }
 
   renderNextShapes() {
     const nextShapes = this.game.board.getNextShapes().getNextShapes()
@@ -47,22 +71,40 @@ class RightPanel extends Panel {
     this.ctx.font = `24px Game`
 
     this.ctx.textAlign = 'left'
-    this.ctx.fillText(`Score`, 0, height - margin - 150)
-    this.ctx.fillText(`Level`, 0, height - margin - 100)
-    this.ctx.fillText(`Lines`, 0, height - margin - 50)
-    this.ctx.fillText(`Time`, 0, height - margin)
+    this.ctx.fillText(`Score`, 0, height - margin - 250)
+    this.ctx.fillText(`Level`, 0, height - margin - 200)
+    this.ctx.fillText(`Lines`, 0, height - margin - 150)
+    this.ctx.fillText(`Time`, 0, height - margin - 100)
 
     this.ctx.textAlign = 'right'
-    this.ctx.fillText(`${this.game.score.score}`, width - margin, height - margin - 150)
-    this.ctx.fillText(`${this.game.level.getLevel()}`, width - margin, height - margin - 100)
-    this.ctx.fillText(`${this.game.level.getReducedRows()}`, width - margin, height - margin - 50)
-    this.ctx.fillText(`${this.formatTime(this.game.gameTime)}`, width - margin, height - margin)
+    this.ctx.fillText(`${this.game.score.score}`, width - margin, height - margin - 250)
+    this.ctx.fillText(`${this.game.level.getLevel()}`, width - margin, height - margin - 200)
+    this.ctx.fillText(`${this.game.level.getReducedRows()}`, width - margin, height - margin - 150)
+    this.ctx.fillText(
+      `${this.formatTime(this.game.gameTime)}`,
+      width - margin,
+      height - margin - 100
+    )
   }
 
   private formatTime(milliseconds: number) {
     const seconds = Math.floor(milliseconds / 1000) % 60
     const minutes = Math.floor(milliseconds / 1000 / 60)
     return `${minutes}:${seconds.toString().padStart(2, '0')}`
+  }
+
+  handleClick(x: number, y: number) {
+    if (this.pauseButton.inBounds(x, y)) {
+      this.pauseButton.handleClick()
+    }
+  }
+
+  handleMouseMove(x: number, y: number) {
+    if (this.pauseButton.inBounds(x, y)) {
+      this.pauseButton.hover()
+    } else {
+      this.pauseButton.unhover()
+    }
   }
 }
 

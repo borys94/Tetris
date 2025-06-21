@@ -8,6 +8,8 @@ const colors: Record<Variant, string> = {
 const MIN_OPACITY = 0.75
 
 class Button {
+  public clickCallback: (() => void) | undefined
+
   private text: string
   private fillColor: string
   private textColor: string
@@ -23,6 +25,8 @@ class Button {
   private hovered = false
   private hoverDuration = 150
   private hoverElapsed = 0
+
+  private hidden = false
 
   constructor(text: string, variant: Variant, x: number, y: number, width: number, height: number) {
     this.text = text
@@ -52,6 +56,11 @@ class Button {
   }
 
   render(ctx: CanvasRenderingContext2D): void {
+    if (this.hidden) {
+      return
+    }
+
+    ctx.save()
     ctx.fillStyle = this.fillColor
     ctx.globalAlpha = this.opacity
     ctx.fillRect(this.x, this.y, this.width, this.height)
@@ -62,10 +71,12 @@ class Button {
     ctx.textBaseline = 'middle'
     ctx.font = '25px Game'
     ctx.fillText(this.text, this.x + this.width / 2, this.y + this.height / 2, this.width)
+
+    ctx.restore()
   }
 
   hover() {
-    if (this.hovered) {
+    if (this.hovered || this.hidden) {
       return
     }
 
@@ -74,7 +85,7 @@ class Button {
   }
 
   unhover() {
-    if (!this.hovered) {
+    if (!this.hovered || this.hidden) {
       return
     }
 
@@ -83,7 +94,17 @@ class Button {
   }
 
   handleClick() {
-    console.log('clicked')
+    if (this.clickCallback && !this.hidden) {
+      this.clickCallback()
+    }
+  }
+
+  onClick(callback: () => void) {
+    this.clickCallback = callback
+  }
+
+  setHidden(hidden: boolean) {
+    this.hidden = hidden
   }
 }
 
