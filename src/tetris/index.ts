@@ -15,7 +15,7 @@ class Tetris {
 
     setHighDpiCanvas(canvas, config.board.width + config.rightPanel.width, config.board.height)
 
-    this.game = new Game()
+    this.game = new Game(canvas)
 
     this.gameLoop = this.gameLoop.bind(this)
     this.gameLoop()

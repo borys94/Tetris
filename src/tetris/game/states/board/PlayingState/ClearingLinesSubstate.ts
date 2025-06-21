@@ -5,7 +5,7 @@ import ImageLoader from '../../../../imageLoader'
 import type Game from '../../..'
 import { AddPointsEffect } from '../../../effects/addPointsEffect'
 import { ShakeDownEffect } from '../../../effects/shakeEffect'
-import { PlayingSubstate } from './PlayingSubstate'
+import { PlayingSubstate } from './playingSubstate'
 
 export class ClearingLinesSubstate extends PlayingSubstate {
   protected disableParentUpdate = true

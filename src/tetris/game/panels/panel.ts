@@ -14,10 +14,37 @@ abstract class Panel {
     const { canvas, ctx } = createCanvas(width, height)
     this.canvas = canvas
     this.ctx = ctx
+
+    // this.game.canvas.addEventListener('click', (e) => {
+    //   this.handleClick(e.offsetX, e.offsetY)
+    // })
+
+    // this.game.canvas.addEventListener('mousemove', (e) => {
+    //   this.handleMouseMove(e.offsetX, e.offsetY)
+    // })
+
+    // this.game.canvas.addEventListener('mouseleave', () => {
+    //   this.handleMouseLeave()
+    // })
   }
 
   abstract render(): HTMLCanvasElement
   abstract update(deltaTime: number): void
+
+  // TODO: fix this
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  handleClick(_x: number, _y: number) {
+    // Override in subclasses to handle click events
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  handleMouseMove(_x: number, _y: number) {
+    // Override in subclasses to handle mouse move events
+  }
+
+  handleMouseLeave() {
+    // Override in subclasses to handle mouse leave events
+  }
 }
 
 export default Panel

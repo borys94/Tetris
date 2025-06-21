@@ -1,4 +1,4 @@
-import { SoftDropSubstate } from './SoftDropSubstate'
+import { SoftDropSubstate } from './softDropSubstate'
 
 export class HardDropSubstate extends SoftDropSubstate {
   protected duration = 25

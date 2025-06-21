@@ -1,10 +1,10 @@
 import config from '../../config'
 import type { InputType } from '../../inputHandler'
 import Game from '..'
-import { GameOverState } from '../states/board/GameOverState'
+import { GameOverState } from '../states/board/gameOverState'
 import InitState from '../states/board/initState'
-import { PauseState } from '../states/board/PauseState'
-import { PlayingState } from '../states/board/PlayingState'
+import { PauseState } from '../states/board/pauseState'
+import { PlayingState } from '../states/board/playingState'
 import type { State } from '../states/State'
 import Panel from './panel'
 
@@ -43,6 +43,18 @@ class BoardPanel extends Panel {
 
   handleInput(input: InputType[]) {
     this.currentState?.handleInput(input)
+  }
+
+  handleClick(x: number, y: number) {
+    this.currentState?.handleClick(x, y)
+  }
+
+  handleMouseMove(x: number, y: number) {
+    this.currentState?.handleMouseMove(x, y)
+  }
+
+  handleMouseLeave() {
+    this.currentState?.handleMouseLeave()
   }
 }
 

@@ -1,5 +1,5 @@
 import type { InputType } from '../../../../inputHandler'
-import { PlayingSubstate } from './PlayingSubstate'
+import { PlayingSubstate } from './playingSubstate'
 
 export class SoftDropSubstate extends PlayingSubstate {
   private pointsForDrop = 1
