@@ -6,7 +6,6 @@ export default defineConfig({
   plugins: [react(), fullReloadOnTSChange()],
 })
 
-
 function fullReloadOnTSChange() {
   return {
     name: 'full-reload-on-ts-change',

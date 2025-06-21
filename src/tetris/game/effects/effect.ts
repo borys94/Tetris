@@ -1,7 +1,7 @@
-import type Game from '../Game'
+import type Game from '..'
 
 export abstract class Effect {
-  protected elapsed = 0
+  private elapsed = 0
   protected progress = 0
   protected abstract duration: number
 

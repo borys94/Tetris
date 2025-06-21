@@ -1,4 +1,4 @@
-import type Game from '../../Game'
+import type Game from '../..'
 import type { InputType } from '../../../inputHandler'
 import { State } from '../State'
 import { drawBackground } from '../../../helpers/board'

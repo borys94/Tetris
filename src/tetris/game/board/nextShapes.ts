@@ -1,4 +1,4 @@
-import Shape from "./Shape";
+import Shape from './shape'
 
 const NEXT_SHAPES_COUNT = 4
 
@@ -14,7 +14,7 @@ export default class NextShapes {
   }
 
   getNextShapes() {
-    return this.nextShapes.map(shape => shape.getPositions())
+    return this.nextShapes.map((shape) => shape.getPositions())
   }
 
   shift() {

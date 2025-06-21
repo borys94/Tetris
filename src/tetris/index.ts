@@ -1,9 +1,7 @@
 import config from './config'
-import Game from './game/Game'
+import Game from './game'
 import { setHighDpiCanvas } from './helpers/canvas'
 import InputHandler from './inputHandler'
-
-export type TetrisStateType = 'paused' | 'playing' | 'gameOver'
 
 class Tetris {
   private ctx: CanvasRenderingContext2D
@@ -15,11 +13,7 @@ class Tetris {
     this.ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D
     this.ctx.imageSmoothingEnabled = false
 
-    setHighDpiCanvas(
-      canvas,
-      config.board.width + config.rightPanel.width,
-      config.board.height
-    )
+    setHighDpiCanvas(canvas, config.board.width + config.rightPanel.width, config.board.height)
 
     this.game = new Game()
 

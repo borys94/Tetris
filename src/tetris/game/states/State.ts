@@ -1,4 +1,4 @@
-import type Game from '../Game'
+import type Game from '..'
 import type { InputType } from '../../inputHandler'
 
 export abstract class State {

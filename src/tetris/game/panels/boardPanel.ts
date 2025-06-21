@@ -1,12 +1,14 @@
-import type { TetrisStateType } from "../.."
-import config from "../../config"
-import type { InputType } from "../../inputHandler"
-import Game from "../Game"
-import { GameOverState } from "../states/board/GameOverState"
-import { PauseState } from "../states/board/PauseState"
-import { PlayingState } from "../states/board/PlayingState"
-import type { State } from "../states/State"
-import Panel from "./panel"
+import config from '../../config'
+import type { InputType } from '../../inputHandler'
+import Game from '..'
+import { GameOverState } from '../states/board/GameOverState'
+import InitState from '../states/board/initState'
+import { PauseState } from '../states/board/PauseState'
+import { PlayingState } from '../states/board/PlayingState'
+import type { State } from '../states/State'
+import Panel from './panel'
+
+export type TetrisStateType = 'init' | 'paused' | 'playing' | 'gameOver'
 
 class BoardPanel extends Panel {
   private currentState: State | undefined
@@ -16,12 +18,13 @@ class BoardPanel extends Panel {
     super(game, config.board.width, config.board.height)
 
     this.states = {
+      init: new InitState(game),
       paused: new PauseState(game),
       playing: new PlayingState(game),
       gameOver: new GameOverState(game),
     }
 
-    this.setState('playing')
+    this.setState('init')
   }
 
   setState(state: TetrisStateType) {

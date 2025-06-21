@@ -1,7 +1,7 @@
 import config from '../../config'
 import { clearCanvas } from '../../helpers/canvas'
 import imageLoader from '../../imageLoader'
-import type Game from '../Game'
+import type Game from '..'
 import Panel from './panel'
 
 class RightPanel extends Panel {

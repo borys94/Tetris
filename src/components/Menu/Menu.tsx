@@ -1,32 +1,34 @@
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
 import styles from './Menu.module.scss'
+import SettingsModal from './SettingsModal/SettingsModal'
 
 const Menu = () => {
+  const [isOpen, setIsOpen] = useState(false)
   return (
     <div className={styles.container}>
       <div className={styles.topItems}>
-        <MenuItem label="Home" to="/" />
-        <MenuItem label="Game" to="/game" />
-        <MenuItem label="Leaderboard" to="/leaderboard" />
+        <MenuItem>My results</MenuItem>
       </div>
       <div>
-        <MenuItem label="Settings" onClick={() => {}} />
-        <MenuItem label="Github" to="/settings" />
+        <MenuItem onClick={() => setIsOpen(true)}>Settings</MenuItem>
+        <a className={styles.menuItem} href="https://github.com/borys94/Tetris" target="_blank">
+          Github
+        </a>
       </div>
+      <SettingsModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
     </div>
   )
 }
 
 type MenuItemProps = {
-  label: string
-  to?: string
   onClick?: () => void
+  children?: React.ReactNode
 }
 
-const MenuItem = ({ label, to, onClick }: MenuItemProps) => {
+const MenuItem = ({ onClick, children }: MenuItemProps) => {
   return (
     <div className={styles.menuItem}>
-      {to ? <Link to={to}>{label}</Link> : <div onClick={onClick}>{label}</div>}
+      <div onClick={onClick}>{children}</div>
     </div>
   )
 }

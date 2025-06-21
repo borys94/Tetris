@@ -1,6 +1,6 @@
 import type { PlayingState } from '.'
 import { ShakeLeftEffect, ShakeRightEffect } from '../../../effects/shakeEffect'
-import type Game from '../../../Game'
+import type Game from '../../..'
 import { PlayingSubstate } from './PlayingSubstate'
 
 abstract class MoveSubstate extends PlayingSubstate {

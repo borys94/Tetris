@@ -1,4 +1,4 @@
-import type Game from '../../../Game'
+import type Game from '../../..'
 import ImageLoader from '../../../../imageLoader'
 import type { InputType } from '../../../../inputHandler'
 import { TetrisStateWithSubstates } from '../../State'
@@ -35,9 +35,7 @@ export class PlayingState extends TetrisStateWithSubstates {
 
   protected effects: Effect[] = []
 
-  constructor(
-    protected game: Game,
-  ) {
+  constructor(protected game: Game) {
     super(game)
   }
 
@@ -52,9 +50,10 @@ export class PlayingState extends TetrisStateWithSubstates {
 
   // TODO: refactor this
   update(deltaTime: number) {
+    this.game.gameTime += deltaTime
     this.lastPrevState += deltaTime
 
-    this.effects = this.effects.filter(effect => {
+    this.effects = this.effects.filter((effect) => {
       effect.update(deltaTime)
       return !effect.isFinished()
     })
@@ -90,7 +89,7 @@ export class PlayingState extends TetrisStateWithSubstates {
     this.renderShapeOnBoard(ctx)
     this.currentSubstate?.render(ctx)
 
-    this.effects.forEach(effect => effect.render(ctx))
+    this.effects.forEach((effect) => effect.render(ctx))
   }
 
   handleInput(inputs: InputType[]) {
@@ -125,7 +124,13 @@ export class PlayingState extends TetrisStateWithSubstates {
       for (let y = 0; y < shapeHeap[0].length; y++) {
         const brickImg = ImageLoader.getBrickByColor(shapeHeap[x][y])
         if (shapeHeap[x][y] && brickImg) {
-          ctx.drawImage(brickImg, y * brickSize + config.board.margin, x * brickSize + config.board.margin, brickSize, brickSize)
+          ctx.drawImage(
+            brickImg,
+            y * brickSize + config.board.margin,
+            x * brickSize + config.board.margin,
+            brickSize,
+            brickSize
+          )
         }
       }
     }
@@ -139,13 +144,20 @@ export class PlayingState extends TetrisStateWithSubstates {
       for (let y = 0; y < heap[0].length; y++) {
         const brickImg = ImageLoader.getBrickByColor(heap[x][y])
         if (heap[x][y] && brickImg) {
-          ctx.drawImage(brickImg, y * brickSize + config.board.margin, x * brickSize + config.board.margin, brickSize, brickSize)
+          ctx.drawImage(
+            brickImg,
+            y * brickSize + config.board.margin,
+            x * brickSize + config.board.margin,
+            brickSize,
+            brickSize
+          )
         }
       }
     }
   }
 
-  private renderShadow(ctx: CanvasRenderingContext2D) { // TODO: ghost piece
+  private renderShadow(ctx: CanvasRenderingContext2D) {
+    // TODO: ghost piece
     const shapeHeap = this.game.board.getShadowOnEmptyBoard()
     const { brickSize } = config.board
     ctx.fillStyle = `rgb(204, 204, 204)`
@@ -153,7 +165,12 @@ export class PlayingState extends TetrisStateWithSubstates {
     for (let x = 0; x < shapeHeap.length; x++) {
       for (let y = 0; y < shapeHeap[0].length; y++) {
         if (shapeHeap[x][y] === -1) {
-          ctx.fillRect(y * brickSize + config.board.margin, x * brickSize + config.board.margin, brickSize, brickSize)
+          ctx.fillRect(
+            y * brickSize + config.board.margin,
+            x * brickSize + config.board.margin,
+            brickSize,
+            brickSize
+          )
         }
       }
     }

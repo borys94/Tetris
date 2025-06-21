@@ -1,5 +1,5 @@
-import type { InputType } from "../../../../inputHandler"
-import { PlayingSubstate } from "./PlayingSubstate"
+import type { InputType } from '../../../../inputHandler'
+import { PlayingSubstate } from './PlayingSubstate'
 
 export class SoftDropSubstate extends PlayingSubstate {
   private pointsForDrop = 1
@@ -25,7 +25,7 @@ export class SoftDropSubstate extends PlayingSubstate {
       if (this.game.board.isColisionInNextStep()) {
         this.game.board.addShapeToBoard()
         if (this.game.board.isLineToReduce()) {
-          this.parentState.setSubstate('clearingLines')          
+          this.parentState.setSubstate('clearingLines')
         } else {
           this.parentState.setSubstate(null)
         }

@@ -1,5 +1,5 @@
 import config from '../../config'
-import type Game from '../Game'
+import type Game from '..'
 import { Effect } from './effect'
 
 export class AddPointsEffect extends Effect {

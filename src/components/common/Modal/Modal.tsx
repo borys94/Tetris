@@ -23,22 +23,25 @@ const Modal = ({ children, title, onClose, open, confirmButton, cancelButton }: 
           <div className={styles.modalHeader}>
             <span className={styles.modalTitle}>{title}</span>
             <div className={styles.closeIcon} onClick={onClose}>
-              ✕
+              <span className="material-symbols-outlined">close</span>
             </div>
           </div>
           <div>{children}</div>
-          <div className={styles.modalFooter}>
-            {cancelButton && (
-              <Button onClick={onClose} variant="secondary">
-                {cancelButton}
-              </Button>
-            )}
-            {confirmButton && (
-              <Button onClick={onClose} variant="primary">
-                {confirmButton}
-              </Button>
-            )}
-          </div>
+          {confirmButton ||
+            (cancelButton && (
+              <div className={styles.modalFooter}>
+                {cancelButton && (
+                  <Button onClick={onClose} variant="secondary">
+                    {cancelButton}
+                  </Button>
+                )}
+                {confirmButton && (
+                  <Button onClick={onClose} variant="primary">
+                    {confirmButton}
+                  </Button>
+                )}
+              </div>
+            ))}
         </div>
       </div>
     </Portal>

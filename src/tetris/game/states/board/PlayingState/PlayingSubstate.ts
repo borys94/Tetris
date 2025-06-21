@@ -1,4 +1,4 @@
-import { TetrisStateChild } from "../../State"
+import { TetrisStateChild } from '../../State'
 
 export abstract class PlayingSubstate extends TetrisStateChild {
   protected disableParentUpdate = false

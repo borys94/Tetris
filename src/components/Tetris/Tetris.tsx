@@ -1,9 +1,12 @@
 import { useEffect, useRef } from 'react'
-import styles from './Board.module.scss'
-import Tetris from '../../../../tetris'
+import styles from './tetris.module.scss'
+import Tetris from '../../tetris'
+import useTetris from '../../hooks/useTetris'
 
 const Board = () => {
   const tetrisRef = useRef<Tetris>(null)
+
+  const { isGameStarted, setIsGameStarted } = useTetris()
 
   useEffect(() => {
     const canvas = document.getElementById('board') as HTMLCanvasElement

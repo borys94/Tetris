@@ -1,4 +1,12 @@
-const INPUTS = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', 'Space', 'Escape', 'KeyP'] as const
+const INPUTS = [
+  'ArrowRight',
+  'ArrowLeft',
+  'ArrowUp',
+  'ArrowDown',
+  'Space',
+  'Escape',
+  'KeyP',
+] as const
 
 export type InputType = (typeof INPUTS)[number]
 
@@ -16,7 +24,7 @@ class InputHandler {
     window.addEventListener('keyup', (e) => {
       e.preventDefault()
       if (this.hasInput(e.code)) {
-        this.activeKeys = this.activeKeys.filter(key => key != e.code)
+        this.activeKeys = this.activeKeys.filter((key) => key != e.code)
       }
     })
   }

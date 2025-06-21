@@ -1,6 +1,6 @@
-import Shape from './Shape'
-import Board from './Board'
-import config from '../config'
+import Shape from './shape'
+import Board from './board'
+import config from '../../config'
 
 export default class ShapeOnBoard {
   private positionX = Math.floor(config.board.bricksX / 2) - 2
@@ -123,6 +123,8 @@ export default class ShapeOnBoard {
   }
 
   private createEmptyBoard(): number[][] {
-    return new Array(config.board.bricksY).fill([]).map(() => new Array(config.board.bricksX).fill(0))
+    return new Array(config.board.bricksY)
+      .fill([])
+      .map(() => new Array(config.board.bricksX).fill(0))
   }
 }

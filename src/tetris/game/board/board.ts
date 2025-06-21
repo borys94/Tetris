@@ -1,8 +1,8 @@
-import Shape, { ShapeType } from './Shape'
-import copy from '../../helpers/copy'
-import ShapeOnBoard from './ShapeOnBoard'
-import NextShapes from './NextShapes'
-import config from '../config'
+import Shape, { ShapeType } from './shape'
+import copy from '../../../helpers/copy'
+import ShapeOnBoard from './shapeOnBoard'
+import NextShapes from './nextShapes'
+import config from '../../config'
 
 // https://tetris.fandom.com/wiki/SRS
 // https://tetris.fandom.com/wiki/Tetris_Guideline
@@ -15,10 +15,11 @@ export default class Board {
 
   constructor() {
     this.heap = new Array(config.board.bricksY - 3).fill(new Array(config.board.bricksX).fill(0))
-    this.heap = [...this.heap,
+    this.heap = [
+      ...this.heap,
       [1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
       [1, 1, 1, 1, 1, 1, 1, 0, 0, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 0, 1]
+      [1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
     ]
     this.shape = new Shape(ShapeType.IShape, 1)
     // this.shape = Shape.createRandomShape()
@@ -67,12 +68,12 @@ export default class Board {
   }
 
   isLineToReduce() {
-    return this.heap.some(row => row.every(v => v !== 0))
+    return this.heap.some((row) => row.every((v) => v !== 0))
   }
 
   tryReduce() {
     for (let y = 0; y < this.heap.length; y++) {
-      if (this.heap[y].every(v => v !== 0)) {
+      if (this.heap[y].every((v) => v !== 0)) {
         this.reduceLine(y)
       }
     }

@@ -6,7 +6,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  // padding: 24px 0;
+  padding: 24px 0;
 }
 
 .topItems {
@@ -20,12 +20,10 @@
   background-color: $color-light-gray;
   transition: all 0.3s ease;
 
-  a {
-    padding: 12px 24px;
-    outline: none;
-    text-decoration: none;
-    color: $color-green;
-  }
+  padding: 12px 24px;
+  outline: none;
+  text-decoration: none;
+  color: $color-green;
 
   &:hover {
     background-color: rgba($color-green, 0.1);

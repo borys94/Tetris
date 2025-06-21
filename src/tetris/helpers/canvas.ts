@@ -1,5 +1,3 @@
-
-
 export const createCanvas = (width: number, height: number) => {
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
@@ -17,7 +15,7 @@ export const setHighDpiCanvas = (canvas: HTMLCanvasElement, width: number, heigh
   canvas.style.height = height + 'px'
   canvas.width = width * ratio
   canvas.height = height * ratio
-  
+
   canvas.getContext('2d')?.scale(ratio, ratio)
 }
 
@@ -35,7 +33,12 @@ export const clearCanvas = (canvas: HTMLCanvasElement) => {
   canvas.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height)
 }
 
-export const drawCanvas = (ctx: CanvasRenderingContext2D, newCanvas: HTMLCanvasElement, x: number, y: number) => {
+export const drawCanvas = (
+  ctx: CanvasRenderingContext2D,
+  newCanvas: HTMLCanvasElement,
+  x: number,
+  y: number
+) => {
   const ratio = window.devicePixelRatio
   ctx.save()
   ctx.scale(1 / ratio, 1 / ratio)

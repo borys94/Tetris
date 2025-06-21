@@ -1,4 +1,4 @@
-import config from '../../config'
+import config from '../../../config'
 import shapes from './shapes'
 
 export enum ShapeType {
