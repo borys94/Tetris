@@ -5,9 +5,9 @@ import ImageLoader from '../../../../imageLoader'
 import type Game from '../../..'
 import { AddPointsEffect } from '../../../effects/addPointsEffect'
 import { ShakeDownEffect } from '../../../effects/shakeEffect'
-import { PlayingSubstate } from './playingSubstate'
+import { ChildState } from '../../State'
 
-export class ClearingLinesSubstate extends PlayingSubstate {
+export class ClearingLinesSubstate extends ChildState {
   protected disableParentUpdate = true
   private elapsed = 0
   private duration = 150
@@ -37,7 +37,7 @@ export class ClearingLinesSubstate extends PlayingSubstate {
   update(deltaTime: number) {
     if (this.elapsed >= this.duration) {
       this.game.board.tryReduce()
-      this.parentState.setSubstate(null)
+      this.parentState.setSubstate('blockDrop')
     }
 
     this.elapsed += deltaTime
@@ -52,13 +52,16 @@ export class ClearingLinesSubstate extends PlayingSubstate {
         const brickImg = ImageLoader.getBrickByColor(heap[x][y])
         if (heap[x][y] && brickImg) {
           const reducingLinesBelow = this.linesToReduce.filter((v) => v > x).length
-          const height = config.board.brickSize - (this.elapsed / this.duration) * config.board.brickSize
+          const height =
+            config.board.brickSize - (this.elapsed / this.duration) * config.board.brickSize
           if (this.linesToReduce.find((v) => v === x)) {
             ctx.globalAlpha = 1 - this.elapsed / this.duration
             ctx.drawImage(
               brickImg,
               y * config.board.brickSize + config.board.margin,
-              x * config.board.brickSize + config.board.margin + (config.board.brickSize - height) * (reducingLinesBelow + 1),
+              x * config.board.brickSize +
+                config.board.margin +
+                (config.board.brickSize - height) * (reducingLinesBelow + 1),
               config.board.brickSize,
               height
             )
@@ -67,7 +70,9 @@ export class ClearingLinesSubstate extends PlayingSubstate {
             ctx.drawImage(
               brickImg,
               y * config.board.brickSize + config.board.margin,
-              x * config.board.brickSize + config.board.margin + reducingLinesBelow * (config.board.brickSize - height),
+              x * config.board.brickSize +
+                config.board.margin +
+                reducingLinesBelow * (config.board.brickSize - height),
               config.board.brickSize,
               config.board.brickSize
             )

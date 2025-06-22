@@ -1,15 +1,15 @@
 import type Game from '../../..'
 import ImageLoader from '../../../../imageLoader'
 import type { InputType } from '../../../../inputHandler'
-import { TetrisStateWithSubstates } from '../../State'
+import { ParentState, State } from '../../State'
 import { ClearingLinesSubstate } from './clearingLinesSubstate'
 import { HardDropSubstate } from './hardDropSubstate'
 import { MovingLeftSubstate, MovingRightSubstate, RotateSubstate } from './moveSubstate'
-import type { PlayingSubstate } from './playingSubstate'
 import { SoftDropSubstate } from './softDropSubstate'
 import config from '../../../../config'
-import type { Effect } from '../../../effects/effect'
 import { drawBackground } from '../../../../helpers/board'
+import { LockDelaySubstate } from './lockDelayState'
+import { BlockDropSubstate } from './blockDropSubstate'
 
 export type PlayingStateType =
   | 'softDrop'
@@ -18,29 +18,27 @@ export type PlayingStateType =
   | 'movingLeft'
   | 'movingRight'
   | 'clearingLines'
+  | 'lockDelay'
+  | 'blockDrop'
 
-export class PlayingState extends TetrisStateWithSubstates {
+export class PlayingState extends ParentState {
   private lastUpdate = 0
   private lastPrevState = 0
 
-  protected substates: Record<PlayingStateType, PlayingSubstate> = {
+  protected substates: Record<PlayingStateType, State> = {
     softDrop: new SoftDropSubstate(this.game, this),
     hardDrop: new HardDropSubstate(this.game, this),
     rotate: new RotateSubstate(this.game, this),
     movingLeft: new MovingLeftSubstate(this.game, this),
     movingRight: new MovingRightSubstate(this.game, this),
     clearingLines: new ClearingLinesSubstate(this.game, this),
+    lockDelay: new LockDelaySubstate(this.game, this),
+    blockDrop: new BlockDropSubstate(this.game, this),
   }
-  protected currentSubstate: PlayingSubstate | null = null
-
-  protected effects: Effect[] = []
+  protected currentSubstate: State | null = null
 
   constructor(protected game: Game) {
     super(game)
-  }
-
-  addEffect(effect: Effect) {
-    this.effects.push(effect)
   }
 
   enter() {
@@ -53,30 +51,28 @@ export class PlayingState extends TetrisStateWithSubstates {
     this.game.gameTime += deltaTime
     this.lastPrevState += deltaTime
 
-    this.effects = this.effects.filter((effect) => {
-      effect.update(deltaTime)
-      return !effect.isFinished()
-    })
+    super.updateEffects(deltaTime)
 
     if (this.currentSubstate) {
+      if (this.currentSubstate?.isParentUpdateDisabled()) {
+        this.lastUpdate = 0
+      }
       this.currentSubstate.update(deltaTime)
 
-      if (this.currentSubstate.isParentUpdateDisabled()) {
-        this.lastUpdate = 0
+      // update may change current substate
+      if (this.currentSubstate?.isParentUpdateDisabled()) {
         return
       }
     }
 
+    if (this.game.board.isColisionInNextStep()) {
+      this.lastUpdate = 0
+      this.setSubstate('lockDelay')
+      return
+    }
+
     if (this.lastUpdate > 500) {
       this.lastUpdate = 0
-      if (this.game.board.isColisionInNextStep()) {
-        this.game.board.addShapeToBoard()
-        if (this.game.board.isLineToReduce()) {
-          this.setSubstate('clearingLines')
-          this.game.score.addPoints(1)
-        }
-        return
-      }
       this.game.board.moveDown()
     }
     this.lastUpdate += deltaTime
@@ -88,7 +84,7 @@ export class PlayingState extends TetrisStateWithSubstates {
     this.renderShadow(ctx)
     this.renderShapeOnBoard(ctx)
     this.currentSubstate?.render(ctx)
-    this.effects.forEach((effect) => effect.render(ctx))
+    this.renderEffects(ctx)
   }
 
   handleInput(inputs: InputType[]) {

@@ -4,14 +4,14 @@ import config from '../../config'
 
 export default class ShapeOnBoard {
   private positionX = Math.floor(config.board.bricksX / 2) - 2
-  private positionY = -3
+  private positionY = -2
 
   constructor(
     private shape: Shape,
     private board: Board
   ) {
     if (shape.getShapeType() === ShapeType.IShape) {
-      this.positionY = -2
+      this.positionY = -1
     }
   }
 

@@ -1,13 +1,17 @@
 import { useState } from 'react'
 import styles from './Menu.module.scss'
 import SettingsModal from './SettingsModal/SettingsModal'
+import ScoringModal from './ScoringModal/ScoringModal'
 
 const Menu = () => {
   const [isOpen, setIsOpen] = useState(false)
+  const [isScoringOpen, setIsScoringOpen] = useState(false)
+
   return (
     <div className={styles.container}>
       <div className={styles.topItems}>
         <MenuItem>My results</MenuItem>
+        <MenuItem onClick={() => setIsScoringOpen(true)}>Scoring system</MenuItem>
       </div>
       <div>
         <MenuItem onClick={() => setIsOpen(true)}>Settings</MenuItem>
@@ -16,6 +20,7 @@ const Menu = () => {
         </a>
       </div>
       <SettingsModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      <ScoringModal isOpen={isScoringOpen} onClose={() => setIsScoringOpen(false)} />
     </div>
   )
 }
@@ -27,8 +32,8 @@ type MenuItemProps = {
 
 const MenuItem = ({ onClick, children }: MenuItemProps) => {
   return (
-    <div className={styles.menuItem}>
-      <div onClick={onClick}>{children}</div>
+    <div className={styles.menuItem} onClick={onClick}>
+      <div>{children}</div>
     </div>
   )
 }

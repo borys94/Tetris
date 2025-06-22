@@ -1,8 +1,7 @@
 import type { InputType } from '../../../../inputHandler'
-import { PlayingSubstate } from './playingSubstate'
+import { ChildState } from '../../State'
 
-export class SoftDropSubstate extends PlayingSubstate {
-  private pointsForDrop = 1
+export class SoftDropSubstate extends ChildState {
   private dropedLines = 0
   private elapsed = 0
   private addedPoints = false
@@ -22,15 +21,13 @@ export class SoftDropSubstate extends PlayingSubstate {
 
     if (this.elapsed > this.duration) {
       this.elapsed -= this.duration
+
       if (this.game.board.isColisionInNextStep()) {
-        this.game.board.addShapeToBoard()
-        if (this.game.board.isLineToReduce()) {
-          this.parentState.setSubstate('clearingLines')
-        } else {
-          this.parentState.setSubstate(null)
-        }
+        this.parentState.setSubstate('lockDelay')
         this.addPointsForDrop()
+        return
       }
+
       this.game.board.moveDown()
       this.dropedLines++
     }
@@ -47,7 +44,7 @@ export class SoftDropSubstate extends PlayingSubstate {
 
   private addPointsForDrop() {
     if (!this.addedPoints) {
-      this.game.score.addPointForDrop(this.pointsForDrop * this.dropedLines, this.dropRatio)
+      this.game.score.addPointForSoftDrop(this.dropedLines)
       this.addedPoints = true
     }
   }

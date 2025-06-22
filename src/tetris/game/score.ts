@@ -2,6 +2,8 @@ import Level from './level'
 
 const PointsForReducedRows = [40, 100, 300, 1200]
 
+// TODO
+// https://tetris.fandom.com/wiki/Scoring
 export default class Score {
   score: number = 0
 
@@ -15,8 +17,12 @@ export default class Score {
     return PointsForReducedRows[reducedRows - 1] * (this.level.getLevel() + 1)
   }
 
-  addPointForDrop(rows: number, ratio: number) {
-    this.addPoints(rows * ratio)
+  addPointForSoftDrop(rows: number) {
+    this.addPoints(rows)
+  }
+
+  addPointForHardDrop(rows: number) {
+    this.addPoints(rows * 2)
   }
 
   getPoints() {

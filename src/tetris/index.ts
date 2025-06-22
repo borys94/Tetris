@@ -2,22 +2,27 @@ import Game from './game'
 import InputHandler from './inputHandler'
 
 class Tetris {
+  private canvas: HTMLCanvasElement
   private ctx: CanvasRenderingContext2D
-  private timestamp: number = 0
+  private timestamp: number
   private game: Game
-  private inputHandler = new InputHandler()
+  private inputHandler: InputHandler
 
-  constructor(private canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement) {
+    this.canvas = canvas
     this.ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D
-    this.ctx.imageSmoothingEnabled = false
+    this.ctx.imageSmoothingEnabled = true
+
+    this.inputHandler = new InputHandler()
+    this.timestamp = Date.now()
 
     this.game = new Game(canvas)
 
     this.gameLoop = this.gameLoop.bind(this)
-    this.gameLoop()
+    requestAnimationFrame(this.gameLoop)
   }
 
-  private gameLoop(timestamp: number = 0) {
+  private gameLoop(timestamp: number) {
     const deltaTime = timestamp - this.timestamp
     this.timestamp = timestamp
 
