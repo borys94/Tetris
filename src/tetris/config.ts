@@ -4,9 +4,9 @@ import cyanBrick from '../assets/bricks/cyan.png'
 import redBrick from '../assets/bricks/red.png'
 import purpleBrick from '../assets/bricks/purple.png'
 
-const height = 16
+const height = 20
 const width = 10
-const brickSize = 40
+const brickSize = 30
 const margin = 16
 
 const config = {

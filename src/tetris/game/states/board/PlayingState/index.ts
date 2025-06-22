@@ -61,7 +61,8 @@ export class PlayingState extends TetrisStateWithSubstates {
     if (this.currentSubstate) {
       this.currentSubstate.update(deltaTime)
 
-      if (this.currentSubstate?.isParentUpdateDisabled()) {
+      if (this.currentSubstate.isParentUpdateDisabled()) {
+        this.lastUpdate = 0
         return
       }
     }
@@ -72,7 +73,6 @@ export class PlayingState extends TetrisStateWithSubstates {
         this.game.board.addShapeToBoard()
         if (this.game.board.isLineToReduce()) {
           this.setSubstate('clearingLines')
-          console.log('clearingLines')
           this.game.score.addPoints(1)
         }
         return
@@ -88,7 +88,6 @@ export class PlayingState extends TetrisStateWithSubstates {
     this.renderShadow(ctx)
     this.renderShapeOnBoard(ctx)
     this.currentSubstate?.render(ctx)
-
     this.effects.forEach((effect) => effect.render(ctx))
   }
 

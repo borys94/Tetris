@@ -42,6 +42,10 @@ export default class Shape {
     return shapes[this.type].length
   }
 
+  getShapeType() {
+    return this.type
+  }
+
   private getNextRotationIndex() {
     return (this.rotationIndex + 1) % shapes[this.type].length
   }

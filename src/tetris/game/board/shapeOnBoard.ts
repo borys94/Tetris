@@ -1,4 +1,4 @@
-import Shape from './shape'
+import Shape, { ShapeType } from './shape'
 import Board from './board'
 import config from '../../config'
 
@@ -9,7 +9,11 @@ export default class ShapeOnBoard {
   constructor(
     private shape: Shape,
     private board: Board
-  ) {}
+  ) {
+    if (shape.getShapeType() === ShapeType.IShape) {
+      this.positionY = -2
+    }
+  }
 
   colisionInNextStep() {
     return !this.canMove(0, 1)
