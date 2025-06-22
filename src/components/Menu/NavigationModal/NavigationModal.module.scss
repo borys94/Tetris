@@ -1,0 +1,29 @@
+.key {
+  display: inline-block;
+  border: 1px solid rgb(204, 204, 204);
+  border-radius: 4px;
+  padding: 8px 12px;
+  box-shadow:
+    rgba(0, 0, 0, 0.2) 0px 1px 0px,
+    rgb(255, 255, 255) 0px 0px 0px 2px inset;
+  background-color: rgb(247, 247, 247);
+  margin: 0px 10px;
+}
+
+.keyNavigation {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+}
+
+.keysContainer {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px 10px;
+}
+
+.keyWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}

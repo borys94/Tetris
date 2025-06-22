@@ -6,12 +6,12 @@ import InitState from '../states/board/initState'
 import { PauseState } from '../states/board/pauseState'
 import { PlayingState } from '../states/board/playingState'
 import { StateWithButtons, type State } from '../states/State'
-import Panel from './panel'
+import Panel, { type ClickablePanel } from './panel'
 import { ResumingGameState } from '../states/board/resumingGame'
 
 export type TetrisStateType = 'init' | 'paused' | 'playing' | 'gameOver' | 'resumingGame'
 
-class BoardPanel extends Panel {
+class BoardPanel extends Panel implements ClickablePanel {
   private currentState: State | undefined
   private states: Record<TetrisStateType, State>
 
@@ -30,7 +30,7 @@ class BoardPanel extends Panel {
   }
 
   isPlaying() {
-    return this.currentState instanceof PlayingState
+    return this.currentState === this.states.playing
   }
 
   setState(state: TetrisStateType) {

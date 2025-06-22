@@ -2,10 +2,10 @@ import config from '../../config'
 import { clearCanvas } from '../../helpers/canvas'
 import imageLoader from '../../imageLoader'
 import type Game from '..'
-import Panel from './panel'
+import Panel, { type ClickablePanel } from './panel'
 import Button from '../components/button'
 
-class RightPanel extends Panel {
+class RightPanel extends Panel implements ClickablePanel {
   private pauseButton: Button
 
   constructor(game: Game) {

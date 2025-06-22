@@ -1,4 +1,3 @@
-import type Game from '../../..'
 import ImageLoader from '../../../../imageLoader'
 import type { InputType } from '../../../../inputHandler'
 import { ParentState, State } from '../../State'
@@ -36,10 +35,6 @@ export class PlayingState extends ParentState {
     blockDrop: new BlockDropSubstate(this.game, this),
   }
   protected currentSubstate: State | null = null
-
-  constructor(protected game: Game) {
-    super(game)
-  }
 
   enter() {
     this.lastUpdate = 0
@@ -87,6 +82,7 @@ export class PlayingState extends ParentState {
     this.renderEffects(ctx)
   }
 
+  // TODO: handle in different way pause state
   handleInput(inputs: InputType[]) {
     if (this.lastPrevState > 500 && (inputs.includes('Escape') || inputs.includes('KeyP'))) {
       this.game.setBoardPanelState('paused')
@@ -111,6 +107,7 @@ export class PlayingState extends ParentState {
     }
   }
 
+  // TODO: move to helper
   private renderShapeOnBoard(ctx: CanvasRenderingContext2D) {
     const shapeHeap = this.game.board.getShapeOnEmptyBoard()
     const { brickSize } = config.board
@@ -131,6 +128,7 @@ export class PlayingState extends ParentState {
     }
   }
 
+  // TODO: move to helper
   private renderBoard(ctx: CanvasRenderingContext2D) {
     const heap = this.game.board.getHeap()
     const { brickSize } = config.board
@@ -151,6 +149,7 @@ export class PlayingState extends ParentState {
     }
   }
 
+  // TODO: move to helper
   private renderShadow(ctx: CanvasRenderingContext2D) {
     // TODO: ghost piece
     const shapeHeap = this.game.board.getShadowOnEmptyBoard()

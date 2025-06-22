@@ -37,11 +37,6 @@ class Game {
       this.boardPanel.handleMouseMove(e.offsetX, e.offsetY)
       this.rightPanel.handleMouseMove(e.offsetX - config.board.width, e.offsetY)
     })
-
-    this.canvas.addEventListener('mouseleave', () => {
-      this.boardPanel.handleMouseLeave()
-      this.rightPanel.handleMouseLeave()
-    })
   }
 
   public update(deltaTime: number) {

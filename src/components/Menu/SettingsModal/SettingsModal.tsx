@@ -9,7 +9,7 @@ type Props = {
 const SettingsModal = ({ isOpen, onClose }: Props) => {
   return (
     <Modal open={isOpen} onClose={onClose} title="Settings">
-      <h1>Settings</h1>
+      <div className={styles.container}>settings</div>
     </Modal>
   )
 }

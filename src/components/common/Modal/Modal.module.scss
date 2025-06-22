@@ -28,6 +28,18 @@
   justify-content: center;
 }
 
+.smallModal {
+  width: 400px;
+}
+
+.mediumModal {
+  width: 600px;
+}
+
+.largeModal {
+  width: 800px;
+}
+
 .modalHeader {
   display: flex;
   justify-content: space-between;
