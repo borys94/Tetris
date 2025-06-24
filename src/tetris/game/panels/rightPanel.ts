@@ -43,24 +43,41 @@ class RightPanel extends Panel implements ClickablePanel {
   }
 
   renderNextShapes() {
-    const nextShapes = this.game.board.getNextShapes().getNextShapes()
+    const tetrominoQueue = this.game.board.getTetrominoQueue()
 
-    for (let i = 0; i < nextShapes.length; i++) {
-      for (let y = 0; y < nextShapes[i].length; y++) {
-        for (let x = 0; x < nextShapes[i][y].length; x++) {
-          const brickImg = imageLoader.getBrickByColor(nextShapes[i][y][x])
-          const brickSize = config.board.brickSize / 2
-          if (nextShapes[i][y][x] !== 0 && brickImg) {
-            this.ctx.drawImage(
-              brickImg,
-              x * brickSize,
-              i * brickSize * 3 + y * brickSize,
-              brickSize,
-              brickSize
-            )
-          }
+    for (let i = 0; i < tetrominoQueue.length; i++) {
+      const tetromino = tetrominoQueue[i]
+      const blocks = tetromino.getBlocks()
+
+      blocks.forEach(([x, y, color]) => {
+        const brickImg = imageLoader.getBrickByColor(color)
+        const brickSize = config.board.brickSize / 2
+        if (brickImg) {
+          this.ctx.drawImage(
+            brickImg,
+            x * brickSize,
+            i * brickSize * 3 + y * brickSize,
+            brickSize,
+            brickSize
+          )
         }
-      }
+      })
+
+      // for (let y = 0; y < blocks.length; y++) {
+      //   for (let x = 0; x < blocks[y].length; x++) {
+      //     const brickImg = imageLoader.getBrickByColor(blocks[y][x])
+      //     const brickSize = config.board.brickSize / 2
+      //     if (blocks[y][x] !== 0 && brickImg) {
+      //       this.ctx.drawImage(
+      //         brickImg,
+      //         x * brickSize,
+      //         i * brickSize * 3 + y * brickSize,
+      //         brickSize,
+      //         brickSize
+      //       )
+      //     }
+      //   }
+      // }
     }
   }
 

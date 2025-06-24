@@ -6,6 +6,7 @@ const INPUTS = [
   'Space',
   'Escape',
   'KeyP',
+  'KeyZ', // rotate left
 ] as const
 
 export type InputType = (typeof INPUTS)[number]

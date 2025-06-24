@@ -1,13 +1,15 @@
 import type Game from '../../..'
-import config from '../../../../config'
-import { drawBackground } from '../../../../helpers/board'
-import imageLoader from '../../../../imageLoader'
+import {
+  drawActiveTetromino,
+  drawPlayfieldBackground,
+  renderPlayfield,
+} from '../../../../helpers/renderer'
 import type { InputType } from '../../../../inputHandler'
 import { ParentState } from '../../State'
 import {
   MovingLeftSubstate,
   MovingRightSubstate,
-  RotateSubstate,
+  RotateRightSubstate,
   type MoveSubstate,
 } from './moveSubstate'
 
@@ -22,7 +24,7 @@ export class LockDelaySubstate extends ParentState {
   protected substates: Record<string, MoveSubstate> = {
     movingLeft: new MovingLeftSubstate(this.game, this),
     movingRight: new MovingRightSubstate(this.game, this),
-    rotate: new RotateSubstate(this.game, this),
+    rotate: new RotateRightSubstate(this.game, this),
   }
 
   constructor(game: Game, parentState: ParentState) {
@@ -51,67 +53,23 @@ export class LockDelaySubstate extends ParentState {
       this.lastMoveDeltaTime += deltaTime
     }
 
-    if (!this.game.board.isColisionInNextStep() || this.lastMoveDeltaTime > this.duration) {
+    if (!this.game.board.hasCollisionInNextStep() || this.lastMoveDeltaTime > this.duration) {
       this.parentState.setSubstate(null)
     }
 
-    if (this.game.board.isColisionInNextStep() && this.lastMoveDeltaTime > this.duration) {
-      this.game.board.addShapeToBoard()
-      if (this.game.board.isLineToReduce()) {
+    if (this.game.board.hasCollisionInNextStep() && this.lastMoveDeltaTime > this.duration) {
+      this.game.board.mergeActiveTetromino()
+      if (this.game.board.getPlayfield().hasLineToReduce()) {
         this.parentState.setSubstate('clearingLines')
       }
     }
   }
 
   render(ctx: CanvasRenderingContext2D) {
-    drawBackground(ctx)
-    this.renderBoard(ctx)
-    this.renderShapeOnBoard(ctx)
+    drawPlayfieldBackground(ctx)
+    renderPlayfield(ctx, this.game.board)
+    drawActiveTetromino(ctx, this.game.board, 0.5)
     super.renderEffects(ctx)
-  }
-
-  // TODO: move to helper
-  private renderBoard(ctx: CanvasRenderingContext2D) {
-    const heap = this.game.board.getHeap()
-    const { brickSize } = config.board
-
-    for (let x = 0; x < heap.length; x++) {
-      for (let y = 0; y < heap[0].length; y++) {
-        const brickImg = imageLoader.getBrickByColor(heap[x][y])
-        if (heap[x][y] && brickImg) {
-          ctx.drawImage(
-            brickImg,
-            y * brickSize + config.board.margin,
-            x * brickSize + config.board.margin,
-            brickSize,
-            brickSize
-          )
-        }
-      }
-    }
-  }
-
-  // TODO: move to helper
-  private renderShapeOnBoard(ctx: CanvasRenderingContext2D) {
-    const shapeHeap = this.game.board.getShapeOnEmptyBoard()
-    const { brickSize } = config.board
-
-    ctx.globalAlpha = 0.5
-    for (let x = 0; x < shapeHeap.length; x++) {
-      for (let y = 0; y < shapeHeap[0].length; y++) {
-        const brickImg = imageLoader.getBrickByColor(shapeHeap[x][y])
-        if (shapeHeap[x][y] && brickImg) {
-          ctx.drawImage(
-            brickImg,
-            y * brickSize + config.board.margin,
-            x * brickSize + config.board.margin,
-            brickSize,
-            brickSize
-          )
-        }
-      }
-    }
-    ctx.globalAlpha = 1
   }
 
   handleInput(inputs: InputType[]) {

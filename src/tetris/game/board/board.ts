@@ -1,102 +1,95 @@
-import Shape, { ShapeType } from './shape'
-import copy from '../../../helpers/copy'
-import ShapeOnBoard from './shapeOnBoard'
-import NextShapes from './nextShapes'
+import Tetromino from './tetrominos/tetromino'
 import config from '../../config'
+import Playfield from './playfield'
+import ActiveTetromino from './tetrominos/activeTetromino'
+import { TetrominoType } from './tetrominos/shapes'
+import TetrominoMover from './tetrominoMover'
 
-// https://tetris.fandom.com/wiki/SRS
+const QUEUE_SIZE = 4
+
 // https://tetris.fandom.com/wiki/Tetris_Guideline
-
 export default class Board {
-  private heap: number[][] // board without current shape
-  private shape: Shape
-  private shapeOnBoard: ShapeOnBoard
-  private nextShapes: NextShapes = new NextShapes()
+  private playfield: Playfield
+  private tetrominoQueue: Tetromino[]
+  private activeTetromino: ActiveTetromino
 
   constructor() {
-    this.heap = new Array(config.board.bricksY - 3).fill(new Array(config.board.bricksX).fill(0))
-    this.heap = [
-      ...this.heap,
-      [1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
-      [1, 1, 1, 1, 1, 1, 1, 0, 0, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
-    ]
-    this.shape = new Shape(ShapeType.IShape, 1)
-    // this.shape = Shape.createRandomShape()
-    this.shapeOnBoard = new ShapeOnBoard(this.shape, this)
+    this.playfield = new Playfield(config.board.bricksX, config.board.bricksY)
+    this.tetrominoQueue = this.generateQueue()
+    this.activeTetromino = this.nextTetromino()
   }
 
-  // nextStep() {
-  //   if (this.shapeOnBoard.colisionInNextStep()) {
-  //     this.addShapeToBoard()
-  //     this.tryReduce()
-  //   } else {
-  //     this.moveDown()
-  //   }
-  // }
-
   moveDown() {
-    this.shapeOnBoard.moveDown()
+    return new TetrominoMover(this.playfield, this.activeTetromino).moveDown()
   }
 
   moveLeft() {
-    return this.shapeOnBoard.moveLeft()
+    return new TetrominoMover(this.playfield, this.activeTetromino).moveLeft()
   }
 
   moveRight() {
-    return this.shapeOnBoard.moveRight()
+    return new TetrominoMover(this.playfield, this.activeTetromino).moveRight()
   }
 
-  rotate() {
-    return this.shapeOnBoard.rotate()
+  rotateRight() {
+    return new TetrominoMover(this.playfield, this.activeTetromino).rotateRight()
   }
 
-  isColisionInNextStep() {
-    return this.shapeOnBoard.colisionInNextStep()
+  rotateLeft() {
+    return new TetrominoMover(this.playfield, this.activeTetromino).rotateLeft()
   }
 
-  getShapeOnEmptyBoard() {
-    return this.shapeOnBoard.getShapeOnEmptyBoard()
+  mergeActiveTetromino() {
+    this.playfield.merge(this.activeTetromino)
+    this.activeTetromino = this.nextTetromino()
   }
 
-  getShadowOnEmptyBoard() {
-    return this.shapeOnBoard.getShadowOnEmptyBoard()
+  hasCollisionInNextStep() {
+    const moved = this.activeTetromino.clone()
+    moved.moveDown()
+    return this.playfield.hasCollision(moved)
   }
 
-  getHeap() {
-    return this.heap
+  getPlayfield() {
+    return this.playfield
   }
 
-  isLineToReduce() {
-    return this.heap.some((row) => row.every((v) => v !== 0))
+  getTetrominoQueue() {
+    return this.tetrominoQueue
   }
 
-  tryReduce() {
-    for (let y = 0; y < this.heap.length; y++) {
-      if (this.heap[y].every((v) => v !== 0)) {
-        this.reduceLine(y)
-      }
+  getActiveTetromino() {
+    return this.activeTetromino
+  }
+
+  getGhostTetromino() {
+    let ghostTetromino = this.activeTetromino.clone()
+    const moved = ghostTetromino.clone()
+    while (!this.playfield.hasCollision(moved)) {
+      ghostTetromino = moved.clone()
+      moved.moveDown()
     }
+
+    return ghostTetromino
   }
 
-  addShapeToBoard() {
-    this.addShape()
-    this.shape = this.nextShapes.shift()
-    this.shapeOnBoard = new ShapeOnBoard(this.shape, this)
+  private generateQueue() {
+    return Array.from({ length: QUEUE_SIZE }, () => this.generateTetromino())
   }
 
-  getNextShapes() {
-    return this.nextShapes
+  private nextTetromino() {
+    const topTetromino = this.tetrominoQueue.shift()
+    if (!topTetromino) {
+      throw new Error('No tetromino in queue. Should not happen')
+    }
+    this.tetrominoQueue.push(this.generateTetromino())
+    return new ActiveTetromino(topTetromino)
   }
 
-  private addShape() {
-    const shape = this.shapeOnBoard.getShapeOnEmptyBoard()
-    this.heap = this.heap.map((row, y) => row.map((v, x) => shape[y][x] || v))
-  }
-
-  private reduceLine(line: number) {
-    const heap = copy(this.heap)
-    heap.splice(line, 1)
-    this.heap = [new Array(config.board.bricksX).fill(0), ...heap]
+  private generateTetromino() {
+    const enumValues = Object.keys(TetrominoType)
+    const randomIndex = Math.floor(Math.random() * enumValues.length)
+    const color = Math.floor(Math.random() * config.bricks.length) + 1
+    return new Tetromino(enumValues[randomIndex] as unknown as TetrominoType, color)
   }
 }

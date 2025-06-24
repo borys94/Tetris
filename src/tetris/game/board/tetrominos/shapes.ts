@@ -1,9 +1,21 @@
-import type { ShapeType } from '.'
+export type TetrominoBlock = [x: number, y: number, color: number]
+export type Rotation = 0 | 1 | 2 | 3
 
-type DataType = {
-  [key in ShapeType]: number[][][]
+export enum TetrominoType {
+  IShape = 'IShape',
+  ZShape = 'ZShape',
+  SShape = 'SShape',
+  LShape = 'LShape',
+  JShape = 'JShape',
+  OShape = 'OShape',
+  TShape = 'TShape',
 }
 
+type DataType = {
+  [key in TetrominoType]: number[][][]
+}
+
+// TODO: rename to tetrominos?
 const data: DataType = {
   IShape: [
     [
@@ -172,3 +184,4 @@ const data: DataType = {
 }
 
 export default data
+

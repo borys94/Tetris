@@ -1,5 +1,5 @@
 import config from '../../../config'
-import { drawBackground } from '../../../helpers/board'
+import { drawPlayfieldBackground } from '../../../helpers/renderer'
 import Game from '../..'
 import { StateWithButtons } from '../State'
 import Button from '../../components/button'
@@ -33,7 +33,7 @@ class InitState extends StateWithButtons {
   handleInput() {}
 
   render(ctx: CanvasRenderingContext2D) {
-    drawBackground(ctx)
+    drawPlayfieldBackground(ctx)
     super.renderButtons(ctx)
   }
 }

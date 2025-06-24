@@ -1,5 +1,5 @@
 import config from '../../../config'
-import { drawBackground } from '../../../helpers/board'
+import { drawPlayfieldBackground } from '../../../helpers/renderer'
 import { State } from '../State'
 
 export class ResumingGameState extends State {
@@ -18,7 +18,7 @@ export class ResumingGameState extends State {
   }
 
   render(ctx: CanvasRenderingContext2D): void {
-    drawBackground(ctx)
+    drawPlayfieldBackground(ctx)
     ctx.textAlign = 'center'
     ctx.font = `70px Game`
     ctx.fillStyle = '#44bec7'

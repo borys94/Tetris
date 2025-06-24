@@ -42,11 +42,19 @@ export abstract class MoveSubstate extends ChildState {
   abstract performMove(): boolean
 }
 
-export class RotateSubstate extends MoveSubstate {
+export class RotateRightSubstate extends MoveSubstate {
   protected key = 'ArrowUp' as const
 
   performMove() {
-    return this.game.board.rotate()
+    return this.game.board.rotateRight()
+  }
+}
+
+export class RotateLeftSubstate extends MoveSubstate {
+  protected key = 'KeyZ' as const
+
+  performMove() {
+    return this.game.board.rotateLeft()
   }
 }
 

@@ -1,19 +1,19 @@
-import ImageLoader from '../../../../imageLoader'
 import type { InputType } from '../../../../inputHandler'
 import { ParentState, State } from '../../State'
 import { ClearingLinesSubstate } from './clearingLinesSubstate'
 import { HardDropSubstate } from './hardDropSubstate'
-import { MovingLeftSubstate, MovingRightSubstate, RotateSubstate } from './moveSubstate'
+import { MovingLeftSubstate, MovingRightSubstate, RotateLeftSubstate, RotateRightSubstate } from './moveSubstate'
 import { SoftDropSubstate } from './softDropSubstate'
-import config from '../../../../config'
-import { drawBackground } from '../../../../helpers/board'
+import { drawPlayfieldBackground, renderPlayfield } from '../../../../helpers/renderer'
 import { LockDelaySubstate } from './lockDelayState'
 import { BlockDropSubstate } from './blockDropSubstate'
+import { drawActiveTetromino, drawGhostTetromino } from '../../../../helpers/renderer'
 
 export type PlayingStateType =
   | 'softDrop'
   | 'hardDrop'
-  | 'rotate'
+  | 'rotateRight'
+  | 'rotateLeft'
   | 'movingLeft'
   | 'movingRight'
   | 'clearingLines'
@@ -27,7 +27,8 @@ export class PlayingState extends ParentState {
   protected substates: Record<PlayingStateType, State> = {
     softDrop: new SoftDropSubstate(this.game, this),
     hardDrop: new HardDropSubstate(this.game, this),
-    rotate: new RotateSubstate(this.game, this),
+    rotateRight: new RotateRightSubstate(this.game, this),
+    rotateLeft: new RotateLeftSubstate(this.game, this),
     movingLeft: new MovingLeftSubstate(this.game, this),
     movingRight: new MovingRightSubstate(this.game, this),
     clearingLines: new ClearingLinesSubstate(this.game, this),
@@ -39,6 +40,10 @@ export class PlayingState extends ParentState {
   enter() {
     this.lastUpdate = 0
     this.lastPrevState = 0
+  }
+
+  setSubstate(substate: PlayingStateType | null) {
+    super.setSubstate(substate)
   }
 
   // TODO: refactor this
@@ -60,7 +65,7 @@ export class PlayingState extends ParentState {
       }
     }
 
-    if (this.game.board.isColisionInNextStep()) {
+    if (this.game.board.hasCollisionInNextStep()) {
       this.lastUpdate = 0
       this.setSubstate('lockDelay')
       return
@@ -74,10 +79,10 @@ export class PlayingState extends ParentState {
   }
 
   render(ctx: CanvasRenderingContext2D) {
-    drawBackground(ctx)
-    this.renderBoard(ctx)
-    this.renderShadow(ctx)
-    this.renderShapeOnBoard(ctx)
+    drawPlayfieldBackground(ctx)
+    renderPlayfield(ctx, this.game.board)
+    drawGhostTetromino(ctx, this.game.board)
+    drawActiveTetromino(ctx, this.game.board)
     this.currentSubstate?.render(ctx)
     this.renderEffects(ctx)
   }
@@ -99,74 +104,13 @@ export class PlayingState extends ParentState {
     } else if (inputs.includes('ArrowRight')) {
       this.setSubstate('movingRight')
     } else if (inputs.includes('ArrowUp')) {
-      this.setSubstate('rotate')
+      this.setSubstate('rotateRight')
+    } else if (inputs.includes('KeyZ')) {
+      this.setSubstate('rotateLeft')
     } else if (inputs.includes('ArrowDown')) {
       this.setSubstate('softDrop')
     } else if (inputs.includes('Space')) {
       this.setSubstate('hardDrop')
-    }
-  }
-
-  // TODO: move to helper
-  private renderShapeOnBoard(ctx: CanvasRenderingContext2D) {
-    const shapeHeap = this.game.board.getShapeOnEmptyBoard()
-    const { brickSize } = config.board
-
-    for (let x = 0; x < shapeHeap.length; x++) {
-      for (let y = 0; y < shapeHeap[0].length; y++) {
-        const brickImg = ImageLoader.getBrickByColor(shapeHeap[x][y])
-        if (shapeHeap[x][y] && brickImg) {
-          ctx.drawImage(
-            brickImg,
-            y * brickSize + config.board.margin,
-            x * brickSize + config.board.margin,
-            brickSize,
-            brickSize
-          )
-        }
-      }
-    }
-  }
-
-  // TODO: move to helper
-  private renderBoard(ctx: CanvasRenderingContext2D) {
-    const heap = this.game.board.getHeap()
-    const { brickSize } = config.board
-
-    for (let x = 0; x < heap.length; x++) {
-      for (let y = 0; y < heap[0].length; y++) {
-        const brickImg = ImageLoader.getBrickByColor(heap[x][y])
-        if (heap[x][y] && brickImg) {
-          ctx.drawImage(
-            brickImg,
-            y * brickSize + config.board.margin,
-            x * brickSize + config.board.margin,
-            brickSize,
-            brickSize
-          )
-        }
-      }
-    }
-  }
-
-  // TODO: move to helper
-  private renderShadow(ctx: CanvasRenderingContext2D) {
-    // TODO: ghost piece
-    const shapeHeap = this.game.board.getShadowOnEmptyBoard()
-    const { brickSize } = config.board
-    ctx.fillStyle = `rgb(204, 204, 204)`
-
-    for (let x = 0; x < shapeHeap.length; x++) {
-      for (let y = 0; y < shapeHeap[0].length; y++) {
-        if (shapeHeap[x][y] === -1) {
-          ctx.fillRect(
-            y * brickSize + config.board.margin,
-            x * brickSize + config.board.margin,
-            brickSize,
-            brickSize
-          )
-        }
-      }
     }
   }
 }

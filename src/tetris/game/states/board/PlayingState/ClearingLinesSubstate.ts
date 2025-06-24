@@ -1,6 +1,6 @@
 import type { PlayingState } from '.'
 import config from '../../../../config'
-import { drawBackground } from '../../../../helpers/board'
+import { drawPlayfieldBackground } from '../../../../helpers/renderer'
 import ImageLoader from '../../../../imageLoader'
 import type Game from '../../..'
 import { AddPointsEffect } from '../../../effects/addPointsEffect'
@@ -36,7 +36,7 @@ export class ClearingLinesSubstate extends ChildState {
 
   update(deltaTime: number) {
     if (this.elapsed >= this.duration) {
-      this.game.board.tryReduce()
+      this.game.board.getPlayfield().clearLines()
       this.parentState.setSubstate('blockDrop')
     }
 
@@ -44,39 +44,33 @@ export class ClearingLinesSubstate extends ChildState {
   }
 
   render(ctx: CanvasRenderingContext2D) {
-    const heap = this.game.board.getHeap()
-    drawBackground(ctx)
+    const blocks = this.game.board.getPlayfield().getBlocks()
+    const { brickSize } = config.board
 
-    for (let x = 0; x < heap.length; x++) {
-      for (let y = 0; y < heap[0].length; y++) {
-        const brickImg = ImageLoader.getBrickByColor(heap[x][y])
-        if (heap[x][y] && brickImg) {
-          const reducingLinesBelow = this.linesToReduce.filter((v) => v > x).length
-          const height =
-            config.board.brickSize - (this.elapsed / this.duration) * config.board.brickSize
-          if (this.linesToReduce.find((v) => v === x)) {
-            ctx.globalAlpha = 1 - this.elapsed / this.duration
-            ctx.drawImage(
-              brickImg,
-              y * config.board.brickSize + config.board.margin,
-              x * config.board.brickSize +
-                config.board.margin +
-                (config.board.brickSize - height) * (reducingLinesBelow + 1),
-              config.board.brickSize,
-              height
-            )
-            ctx.globalAlpha = 1
-          } else {
-            ctx.drawImage(
-              brickImg,
-              y * config.board.brickSize + config.board.margin,
-              x * config.board.brickSize +
-                config.board.margin +
-                reducingLinesBelow * (config.board.brickSize - height),
-              config.board.brickSize,
-              config.board.brickSize
-            )
-          }
+    drawPlayfieldBackground(ctx)
+    for (const [x, y, color] of blocks) {
+      const brickImg = ImageLoader.getBrickByColor(color)
+      if (brickImg) {
+        const reducingLinesBelow = this.linesToReduce.filter((v) => v > y).length
+        const height = brickSize - (this.elapsed / this.duration) * brickSize
+        if (this.linesToReduce.find((v) => v === y)) {
+          ctx.globalAlpha = 1 - this.elapsed / this.duration
+          ctx.drawImage(
+            brickImg,
+            x * brickSize + config.board.margin,
+            y * brickSize + config.board.margin + (brickSize - height) * (reducingLinesBelow + 1),
+            brickSize,
+            height
+          )
+          ctx.globalAlpha = 1
+        } else {
+          ctx.drawImage(
+            brickImg,
+            x * brickSize + config.board.margin,
+            y * brickSize + config.board.margin + reducingLinesBelow * (brickSize - height),
+            brickSize,
+            brickSize
+          )
         }
       }
     }
@@ -85,9 +79,18 @@ export class ClearingLinesSubstate extends ChildState {
   handleInput() {}
 
   private getLinesToReduce() {
-    return this.game.board
-      .getHeap()
-      .map((row, index) => (row.every((v) => v !== 0) ? index : -1))
-      .filter((v) => v !== -1)
+    const playfield = this.game.board.getPlayfield()
+    const blocks = playfield.getBlocks()
+    const width = playfield.getWidth()
+    const height = playfield.getHeight()
+    const linesToReduce: number[] = []
+
+    for (let y = 0; y < height; y++) {
+      if (blocks.filter(([, by]) => by === y).length === width) {
+        linesToReduce.push(y)
+      }
+    }
+
+    return linesToReduce
   }
 }

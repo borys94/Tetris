@@ -1,7 +1,7 @@
 import type Game from '../..'
 import type { InputType } from '../../../inputHandler'
 import { StateWithButtons } from '../State'
-import { drawBackground } from '../../../helpers/board'
+import { drawPlayfieldBackground } from '../../../helpers/renderer'
 import config from '../../../config'
 import Button from '../../components/button'
 
@@ -53,7 +53,7 @@ export class PauseState extends StateWithButtons {
   }
 
   render(ctx: CanvasRenderingContext2D) {
-    drawBackground(ctx)
+    drawPlayfieldBackground(ctx)
 
     ctx.textAlign = 'center'
     ctx.font = `50px Game`

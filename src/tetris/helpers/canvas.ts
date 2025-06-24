@@ -20,7 +20,6 @@ export const setHighDpiCanvas = (canvas: HTMLCanvasElement, width: number, heigh
 }
 
 export const cloneCanvas = (canvas: HTMLCanvasElement, newCanvas: HTMLCanvasElement) => {
-  // const newCanvas = document.createElement('canvas')
   newCanvas.width = canvas.width
   newCanvas.height = canvas.height
   newCanvas.style.width = canvas.style.width

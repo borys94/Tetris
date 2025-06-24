@@ -22,7 +22,7 @@ export class SoftDropSubstate extends ChildState {
     if (this.elapsed > this.duration) {
       this.elapsed -= this.duration
 
-      if (this.game.board.isColisionInNextStep()) {
+      if (this.game.board.hasCollisionInNextStep()) {
         this.parentState.setSubstate('lockDelay')
         this.addPointsForDrop()
         return
