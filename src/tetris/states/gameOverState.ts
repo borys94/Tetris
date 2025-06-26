@@ -1,13 +1,13 @@
-import type { InputType } from "../../inputHandler"
-import GameState from "./gameState"
-import { GameStateType } from "../gameStateMachine"
+import type { InputType } from '../inputHandler'
+import State from './state'
+import { GameStateType } from './gameStateMachine'
 
-export default class GameOverState extends GameState<GameStateType> {
-  update(): void {
+export default class GameOverState extends State<GameStateType> {
+  update() {
     // No updates when game over
   }
 
-  handleInput(inputs: InputType[]): void {
+  handleInput(inputs: InputType[]) {
     if (inputs.includes('Space')) {
       // Restart game - handled by state machine
     }
@@ -16,7 +16,7 @@ export default class GameOverState extends GameState<GameStateType> {
     }
   }
 
-  render(ctx: CanvasRenderingContext2D): void {
+  render(ctx: CanvasRenderingContext2D) {
     const ratio = window.devicePixelRatio
     // Render game over screen
     ctx.fillStyle = 'rgba(0, 0, 0, 0.8)'
@@ -34,15 +34,15 @@ export default class GameOverState extends GameState<GameStateType> {
       ctx.canvas.width / ratio / 2,
       ctx.canvas.height / ratio / 2
     )
-    ctx.fillText('Press SPACE to restart', ctx.canvas.width / ratio / 2, ctx.canvas.height / ratio / 2 + 50)
-    ctx.fillText('Press ESC for menu', ctx.canvas.width / ratio / 2, ctx.canvas.height / ratio / 2 + 80)
-  }
-
-  enter(): void {
-    console.log('Entering Game Over State')
-  }
-
-  exit(): void {
-    console.log('Exiting Game Over State')
+    ctx.fillText(
+      'Press SPACE to restart',
+      ctx.canvas.width / ratio / 2,
+      ctx.canvas.height / ratio / 2 + 50
+    )
+    ctx.fillText(
+      'Press ESC for menu',
+      ctx.canvas.width / ratio / 2,
+      ctx.canvas.height / ratio / 2 + 80
+    )
   }
 }

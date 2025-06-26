@@ -1,6 +1,6 @@
-import Board from "./board/board"
-import Level from "./level"
-import Scoring from "./score"
+import Board from './board/board'
+import Level from './level'
+import Scoring from './score'
 
 class GameCore {
   private board: Board

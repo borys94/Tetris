@@ -1,20 +1,17 @@
-import type { InputType } from "../../inputHandler"
-import GameState from "./gameState"
-import { GameStateType } from "../gameStateMachine"
+import type { InputType } from '../inputHandler'
+import State from './state'
+import { GameStateType } from './gameStateMachine'
 
-export default class PausedState extends GameState<GameStateType> {
-  private timer = 0
-  private pauseDelay = 500
+export default class PausedState extends State<GameStateType> {
   private canUnpause = false
 
-  update(deltaTime: number): void {
-    this.timer += deltaTime
-    if (this.timer >= this.pauseDelay) {
-      this.canUnpause = true
-    }
-  }
+  update(): void {}
 
   handleInput(inputs: InputType[]): void {
+    if (!inputs.includes('KeyP') && !inputs.includes('Escape')) {
+      this.canUnpause = true
+    }
+
     if (this.canUnpause && (inputs.includes('KeyP') || inputs.includes('Escape'))) {
       this.setTransition(GameStateType.PLAYING)
     }
@@ -32,17 +29,15 @@ export default class PausedState extends GameState<GameStateType> {
     ctx.fillText('PAUSED', ctx.canvas.width / ratio / 2, ctx.canvas.height / ratio / 2)
 
     ctx.font = '24px Arial'
-    ctx.fillText('Press P or ESC to resume', ctx.canvas.width / ratio / 2, ctx.canvas.height / ratio / 2 + 50)
+    ctx.fillText(
+      'Press P or ESC to resume',
+      ctx.canvas.width / ratio / 2,
+      ctx.canvas.height / ratio / 2 + 50
+    )
   }
 
   enter(): void {
     super.enter()
-    this.timer = 0
     this.canUnpause = false
-    console.log('Entering Paused State')
-  }
-
-  exit(): void {
-    console.log('Exiting Paused State')
   }
 }

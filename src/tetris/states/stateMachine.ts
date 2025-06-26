@@ -1,11 +1,12 @@
 import GameCore from '../core/gameCore'
 import type { InputType } from '../inputHandler'
-import type GameState from './states/gameState'
+import type State from './state'
 
 export default abstract class StateMachine<StateType extends string> {
-  protected abstract currentState: GameState<StateType>
-  protected abstract states: Map<StateType, GameState<StateType>>
+  protected abstract currentState: State<StateType>
+  protected abstract states: Map<StateType, State<StateType>>
   protected gameCore: GameCore
+  protected canHandleInput: boolean = false
 
   constructor(gameCore: GameCore) {
     this.gameCore = gameCore
@@ -13,7 +14,7 @@ export default abstract class StateMachine<StateType extends string> {
 
   update(deltaTime: number): void {
     this.currentState.update(deltaTime)
-    
+
     const nextStateType = this.currentState.getTransition()
     if (nextStateType) {
       this.changeState(nextStateType)
@@ -25,6 +26,14 @@ export default abstract class StateMachine<StateType extends string> {
   }
 
   handleInput(inputs: InputType[]): void {
+    if (!inputs.length && !this.canHandleInput) {
+      this.canHandleInput = true
+    }
+
+    if (!this.canHandleInput) {
+      return
+    }
+
     this.currentState.handleInput(inputs)
   }
 
@@ -34,9 +43,11 @@ export default abstract class StateMachine<StateType extends string> {
       throw new Error(`State ${newStateType} not found`)
     }
 
-    this.currentState.exit()
+    console.log('Exiting state', this.getCurrentStateType())
     this.currentState = newState
+    console.log('Entering state', this.getCurrentStateType())
     this.currentState.enter()
+    this.canHandleInput = false
   }
 
   getCurrentStateType(): StateType {
@@ -61,7 +72,7 @@ export default abstract class StateMachine<StateType extends string> {
   //   this.gameCore.getLevel().reset()
   // }
 
-  getCurrentState(): GameState<StateType> {
+  getCurrentState(): State<StateType> {
     return this.currentState
   }
 }

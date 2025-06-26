@@ -1,10 +1,10 @@
 import GameCore from '../core/gameCore'
 import StateMachine from './stateMachine'
-import GameOverState from './states/gameOverState'
-import type GameState from './states/gameState'
-import MenuState from './states/menuState'
-import PausedState from './states/pausedState'
-import PlayingState from './states/playingState/playingState'
+import GameOverState from './gameOverState'
+import type State from './state'
+import MenuState from './menuState'
+import PausedState from './pausedState'
+import PlayingState from './playingState'
 
 export enum GameStateType {
   MENU = 'MENU',
@@ -14,13 +14,13 @@ export enum GameStateType {
 }
 
 export class GameStateMachine extends StateMachine<GameStateType> {
-  protected currentState: GameState<GameStateType>
-  protected states: Map<GameStateType, GameState<GameStateType>>
-  
+  protected currentState: State<GameStateType>
+  protected states: Map<GameStateType, State<GameStateType>>
+
   constructor(gameCore: GameCore) {
     super(gameCore)
 
-    this.states = new Map<GameStateType, GameState<GameStateType>>([
+    this.states = new Map<GameStateType, State<GameStateType>>([
       [GameStateType.MENU, new MenuState(gameCore)],
       [GameStateType.PLAYING, new PlayingState(gameCore)],
       [GameStateType.PAUSED, new PausedState(gameCore)],

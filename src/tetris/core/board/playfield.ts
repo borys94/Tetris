@@ -45,7 +45,7 @@ export default class Playfield {
     })
   }
 
-  hasLineToReduce() {
+  hasLineToClear() {
     return this.grid.some((row) => row.every((v) => v !== 0))
   }
 

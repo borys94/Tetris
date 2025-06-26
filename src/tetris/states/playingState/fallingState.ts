@@ -1,11 +1,11 @@
-import type { InputType } from "../../../inputHandler"
-import { drawPlayfield, drawPlayfieldBackground, drawTetromino } from "../../renderers/board"
-import GameState from "../gameState"
-import { PlayingStateType } from "./playingStateMachine"
+import type { InputType } from '../../inputHandler'
+import { drawPlayfield, drawTetromino } from '../../helpers/rendering'
+import State from '../state'
+import { PlayingStateType } from './playingStateMachine'
 
-type MoveType = 'left' | 'right' | 'rotateRight' | 'rotateLeft' | null
+type ContinousMoveType = 'left' | 'right' | 'rotateRight' | 'rotateLeft' | null
 
-export default class FallingState extends GameState<PlayingStateType> {
+export default class FallingState extends State<PlayingStateType> {
   private dropTimer: number = 0
   private dropInterval: number = 1000
   private softDropInterval: number = 100
@@ -14,8 +14,7 @@ export default class FallingState extends GameState<PlayingStateType> {
 
   private moveInterval: number = 500
   private moveTimer: number = 0
-  private moveType: MoveType = null
-
+  private continuousMoveType: ContinousMoveType = null
 
   update(deltaTime: number): void {
     this.dropTimer += deltaTime
@@ -29,23 +28,26 @@ export default class FallingState extends GameState<PlayingStateType> {
     if (this.dropTimer >= dropInterval) {
       this.dropTimer = 0
 
-      if (this.gameCore.getBoard().hasCollisionInNextStep()) {
-        // Tetromino has landed, transition to locking state
-        return
-      } else {
+      if (!this.gameCore.getBoard().hasCollisionInNextStep()) {
         if (this.softDropping) {
           this.gameCore.getScoring().addSoftDropPoints(1)
         }
         this.gameCore.getBoard().moveDown()
       }
+
+      if (this.gameCore.getBoard().hasCollisionInNextStep()) {
+        // Tetromino has landed, transition to locking state
+        this.setTransition(PlayingStateType.LOCKING)
+        return
+      }
     }
 
     // Handle continuous movement
-    if (this.moveType) {
+    if (this.continuousMoveType) {
       this.moveTimer += deltaTime
       if (this.moveTimer >= this.moveInterval) {
         this.moveTimer = 0
-        this.performMove(this.moveType)
+        this.performContinuousMove(this.continuousMoveType)
       }
     }
   }
@@ -60,21 +62,21 @@ export default class FallingState extends GameState<PlayingStateType> {
       !inputs.includes('ArrowUp') &&
       !inputs.includes('KeyZ')
     ) {
-      this.setMoveType(null)
+      this.setContinuousMoveType(null)
     }
 
     // Handle movement inputs
     if (inputs.includes('ArrowLeft')) {
-      this.setMoveType('left')
+      this.setContinuousMoveType('left')
     }
     if (inputs.includes('ArrowRight')) {
-      this.setMoveType('right')
+      this.setContinuousMoveType('right')
     }
     if (inputs.includes('ArrowUp')) {
-      this.setMoveType('rotateRight')
+      this.setContinuousMoveType('rotateRight')
     }
     if (inputs.includes('KeyZ')) {
-      this.setMoveType('rotateLeft')
+      this.setContinuousMoveType('rotateLeft')
     }
 
     // Soft drop
@@ -95,6 +97,10 @@ export default class FallingState extends GameState<PlayingStateType> {
         board.mergeActiveTetromino()
         this.gameCore.getScoring().addHardDropPoints(dropDistance)
         this.hardDroppingBlocked = true
+
+        if (this.gameCore.getBoard().getPlayfield().hasLineToClear()) {
+          this.setTransition(PlayingStateType.CLEARING_LINES)
+        }
       }
     } else {
       this.hardDroppingBlocked = false
@@ -102,7 +108,6 @@ export default class FallingState extends GameState<PlayingStateType> {
   }
 
   render(ctx: CanvasRenderingContext2D): void {
-    drawPlayfieldBackground(ctx)
     drawPlayfield(ctx, this.gameCore.getBoard().getPlayfield())
     drawTetromino(ctx, this.gameCore.getBoard().getActiveTetromino(), false)
     drawTetromino(ctx, this.gameCore.getBoard().getGhostTetromino(), true)
@@ -110,34 +115,19 @@ export default class FallingState extends GameState<PlayingStateType> {
 
   enter(): void {
     super.enter()
-    console.log('Entering Falling State')
+    this.dropTimer = 0
   }
 
-  exit(): void {
-    console.log('Exiting Falling State')
-  }
-
-  getTransition(): PlayingStateType | null {
-    const board = this.gameCore.getBoard()
-    
-    // Check if tetromino has landed
-    if (board.hasCollisionInNextStep()) {
-      return PlayingStateType.LOCKING
-    }
-    
-    return null
-  }
-
-  private setMoveType(moveType: MoveType): void {
-    if (this.moveType !== moveType) {
-      this.moveType = moveType
+  private setContinuousMoveType(continuousMoveType: ContinousMoveType): void {
+    if (this.continuousMoveType !== continuousMoveType) {
+      this.continuousMoveType = continuousMoveType
       this.moveTimer = 0
-      this.performMove(moveType)
+      this.performContinuousMove(continuousMoveType)
     }
   }
 
-  private performMove(moveType: MoveType): void {
-    switch (moveType) {
+  private performContinuousMove(continuousMoveType: ContinousMoveType): void {
+    switch (continuousMoveType) {
       case 'left':
         this.gameCore.getBoard().moveLeft()
         break
@@ -152,4 +142,4 @@ export default class FallingState extends GameState<PlayingStateType> {
         break
     }
   }
-} 
+}

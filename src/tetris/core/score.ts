@@ -134,7 +134,7 @@ export default class Scoring {
       LineClearType.T_SPIN_SINGLE,
       LineClearType.T_SPIN_DOUBLE,
       LineClearType.T_SPIN_TRIPLE,
-      LineClearType.MINI_T_SPIN_DOUBLE
+      LineClearType.MINI_T_SPIN_DOUBLE,
     ].includes(lineClearType)
   }
 
@@ -154,7 +154,7 @@ export enum LineClearType {
   MINI_T_SPIN_DOUBLE = 'MINI_T_SPIN_DOUBLE',
   T_SPIN_SINGLE = 'T_SPIN_SINGLE',
   T_SPIN_DOUBLE = 'T_SPIN_DOUBLE',
-  T_SPIN_TRIPLE = 'T_SPIN_TRIPLE'
+  T_SPIN_TRIPLE = 'T_SPIN_TRIPLE',
 }
 
 const LINE_CLEAR_POINTS: Record<LineClearType, number> = {
@@ -166,7 +166,7 @@ const LINE_CLEAR_POINTS: Record<LineClearType, number> = {
   [LineClearType.MINI_T_SPIN_DOUBLE]: 400,
   [LineClearType.T_SPIN_SINGLE]: 800,
   [LineClearType.T_SPIN_DOUBLE]: 1200,
-  [LineClearType.T_SPIN_TRIPLE]: 1600
+  [LineClearType.T_SPIN_TRIPLE]: 1600,
 }
 
 type LineClearCount = 1 | 2 | 3 | 4
@@ -175,7 +175,7 @@ const BASE_LINE_CLEAR_POINTS: Record<LineClearCount, number> = {
   1: LINE_CLEAR_POINTS[LineClearType.SINGLE],
   2: LINE_CLEAR_POINTS[LineClearType.DOUBLE],
   3: LINE_CLEAR_POINTS[LineClearType.TRIPLE],
-  4: LINE_CLEAR_POINTS[LineClearType.TETRIS]
+  4: LINE_CLEAR_POINTS[LineClearType.TETRIS],
 }
 
 // TODO: Implement T-Spin detection logic
