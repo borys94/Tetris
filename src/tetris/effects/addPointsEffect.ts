@@ -1,12 +1,12 @@
-import config from '../../config'
-import type Game from '..'
+import config from '../config'
+import type GameCore from '../core/gameCore'
 import { Effect } from './effect'
 
 export class AddPointsEffect extends Effect {
   protected duration = 1500
 
   constructor(
-    game: Game,
+    game: GameCore,
     private points: number
   ) {
     super(game)

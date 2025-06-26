@@ -1,6 +1,4 @@
-import { cloneCanvas } from '../../helpers/canvas'
-import { clearCanvas } from '../../helpers/canvas'
-import { drawCanvas } from '../../helpers/canvas'
+import { cloneCanvas, clearCanvas, drawCanvas } from '../helpers/canvas'
 import { Effect } from './effect'
 
 abstract class ShakeEffect extends Effect {

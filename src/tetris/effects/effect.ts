@@ -1,11 +1,11 @@
-import type Game from '..'
+import type GameCore from '../core/gameCore'
 
 export abstract class Effect {
   private elapsed = 0
   protected progress = 0
   protected abstract duration: number
 
-  constructor(protected game: Game) {}
+  constructor(protected game: GameCore) {}
 
   abstract enter(): void
   abstract render(ctx: CanvasRenderingContext2D): void
