@@ -26,12 +26,12 @@ export class ClearingLinesSubstate extends ChildState {
     this.parentState.addEffect(
       new AddPointsEffect(
         this.game,
-        this.game.score.getPointsForReducedRows(this.linesToReduce.length)
+        this.game.score.getClearedLinesPoints(this.linesToReduce.length)
       )
     )
     this.parentState.addEffect(new ShakeDownEffect(this.game))
-    this.game.score.addPointsForReducedRows(this.linesToReduce.length)
-    this.game.level.addReducedRows(this.linesToReduce.length)
+    this.game.score.addClearedLines(this.linesToReduce.length)
+    this.game.level.addClearedLines(this.linesToReduce.length)
   }
 
   update(deltaTime: number) {

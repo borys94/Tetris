@@ -5,7 +5,7 @@ import Board from './board/board'
 import Level from './level'
 import BoardPanel, { type TetrisStateType } from './panels/boardPanel'
 import RightPanel from './panels/rightPanel'
-import Score from './score'
+import Score, { Scoring } from './score'
 
 class Game {
   /**
@@ -14,7 +14,7 @@ class Game {
   canvas: HTMLCanvasElement
 
   level = new Level()
-  score = new Score(this.level)
+  score = new Scoring(this.level)
   board = new Board()
   gameTime = 0
 
@@ -65,7 +65,7 @@ class Game {
   public reset() {
     this.board = new Board()
     this.level = new Level()
-    this.score = new Score(this.level)
+    this.score = new Scoring(this.level)
     this.gameTime = 0
   }
 

@@ -96,7 +96,7 @@ class RightPanel extends Panel implements ClickablePanel {
     this.ctx.textAlign = 'right'
     this.ctx.fillText(`${this.game.score.score}`, width - margin, height - margin - 250)
     this.ctx.fillText(`${this.game.level.getLevel()}`, width - margin, height - margin - 200)
-    this.ctx.fillText(`${this.game.level.getReducedRows()}`, width - margin, height - margin - 150)
+    this.ctx.fillText(`${this.game.level.getClearedLines()}`, width - margin, height - margin - 150)
     this.ctx.fillText(
       `${this.formatTime(this.game.gameTime)}`,
       width - margin,

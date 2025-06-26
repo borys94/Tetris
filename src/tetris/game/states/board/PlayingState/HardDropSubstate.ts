@@ -18,7 +18,7 @@ export class HardDropSubstate extends ChildState {
     }
 
     this.game.board.mergeActiveTetromino()
-    this.game.score.addPointForHardDrop(dropedLines)
+    this.game.score.addHardDropPoints(dropedLines)
 
     if (this.game.board.getPlayfield().hasLineToReduce()) {
       this.parentState.setSubstate('clearingLines')
