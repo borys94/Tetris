@@ -37,6 +37,14 @@ export default abstract class StateMachine<StateType extends string> {
     this.currentState.handleInput(inputs)
   }
 
+  handleMouseMove(x: number, y: number): void {
+    this.currentState.handleMouseMove(x, y)
+  }
+
+  handleMouseClick(x: number, y: number): void {
+    this.currentState.handleMouseClick(x, y)
+  }
+
   protected changeState(newStateType: StateType): void {
     const newState = this.states.get(newStateType)
     if (!newState) {
@@ -44,6 +52,7 @@ export default abstract class StateMachine<StateType extends string> {
     }
 
     console.log('Exiting state', this.getCurrentStateType())
+    this.currentState.exit()
     this.currentState = newState
     console.log('Entering state', this.getCurrentStateType())
     this.currentState.enter()
@@ -58,19 +67,6 @@ export default abstract class StateMachine<StateType extends string> {
     }
     throw new Error('Current state not found in states map')
   }
-
-  // private isGameOver(): boolean {
-  //   const board = this.gameCore.getBoard()
-  //   const activeTetromino = board.getActiveTetromino()
-  //   return board.getPlayfield().hasCollision(activeTetromino)
-  // }
-
-  // private restartGame(): void {
-  //   // Reset game core - we'll need to implement a reset method or create new instances
-  //   // For now, we'll just reset scoring and level
-  //   this.gameCore.getScoring().reset()
-  //   this.gameCore.getLevel().reset()
-  // }
 
   getCurrentState(): State<StateType> {
     return this.currentState

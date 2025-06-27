@@ -24,6 +24,12 @@ class GameCore {
   getScoring() {
     return this.scoring
   }
+
+  reset() {
+    this.board = new Board()
+    this.level.reset()
+    this.scoring.reset()
+  }
 }
 
 export default GameCore

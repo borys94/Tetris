@@ -1,4 +1,4 @@
-import shapes, { type Rotation, type TetrominoBlock } from './shapes'
+import shapes, { TetrominoType, type Rotation, type TetrominoBlock } from './shapes'
 import Tetromino from './tetromino'
 
 export default class ActiveTetromino extends Tetromino {
@@ -8,8 +8,8 @@ export default class ActiveTetromino extends Tetromino {
 
   constructor(tetromino: Tetromino) {
     super(tetromino.getType(), tetromino.getColor())
-    this.x = 0
-    this.y = 0
+    this.x = 3
+    this.y = tetromino.getType() === TetrominoType.IShape ? -1 : -2
   }
 
   moveLeft() {

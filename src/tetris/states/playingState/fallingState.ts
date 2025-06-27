@@ -8,11 +8,11 @@ type ContinousMoveType = 'left' | 'right' | 'rotateRight' | 'rotateLeft' | null
 export default class FallingState extends State<PlayingStateType> {
   private dropTimer: number = 0
   private dropInterval: number = 1000
-  private softDropInterval: number = 100
+  private softDropInterval: number = 80
   private softDropping: boolean = false
   private hardDroppingBlocked: boolean = false
 
-  private moveInterval: number = 500
+  private moveInterval: number = 150
   private moveTimer: number = 0
   private continuousMoveType: ContinousMoveType = null
 

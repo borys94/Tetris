@@ -20,9 +20,11 @@ class Tetris {
     this.ctx.imageSmoothingEnabled = true
     setHighDpiCanvas(canvas, config.board.width + config.rightPanel.width, config.board.height)
 
-    this.inputHandler = new InputHandler()
+    this.inputHandler = new InputHandler(this.canvas)
     this.gameCore = new GameCore()
     this.stateMachine = new GameStateMachine(this.gameCore)
+
+    this.setupMouseHandlers()
   }
 
   start(): void {
@@ -46,6 +48,22 @@ class Tetris {
     this.stateMachine.update(deltaTime)
     this.stateMachine.render(this.canvas.getContext('2d')!)
     this.stateMachine.handleInput(this.inputHandler.getActiveKeys())
+  }
+
+  private setupMouseHandlers(): void {
+    this.inputHandler.onMouseMove((event) => {
+      const canvasRect = this.canvas.getBoundingClientRect()
+      const x = event.position.x - canvasRect.left
+      const y = event.position.y - canvasRect.top
+      this.stateMachine.handleMouseMove(x, y)
+    })
+
+    this.inputHandler.onMouseClick((event) => {
+      const canvasRect = this.canvas.getBoundingClientRect()
+      const x = event.position.x - canvasRect.left
+      const y = event.position.y - canvasRect.top
+      this.stateMachine.handleMouseClick(x, y)
+    })
   }
 }
 

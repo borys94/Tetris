@@ -44,3 +44,11 @@ export const drawCanvas = (
   ctx?.drawImage(newCanvas, x * ratio, y * ratio)
   ctx.restore()
 }
+
+export const getCanvasSize = (canvas: HTMLCanvasElement) => {
+  const ratio = window.devicePixelRatio
+  return {
+    width: canvas.width / ratio,
+    height: canvas.height / ratio,
+  }
+}

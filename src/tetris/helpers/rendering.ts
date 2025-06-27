@@ -30,12 +30,16 @@ export const drawTetromino = (
   }
 }
 
-export const drawPlayfieldBackground = (ctx: CanvasRenderingContext2D) => {
-  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+export const drawPlayfieldBackground = (
+  ctx: CanvasRenderingContext2D,
+  x: number = config.board.margin,
+  y: number = config.board.margin
+) => {
+  ctx.clearRect(x, y, ctx.canvas.width, ctx.canvas.height)
   ctx.fillStyle = config.board.backgroundColor
   ctx.fillRect(
-    config.board.margin,
-    config.board.margin,
+    x,
+    y,
     config.board.width - config.board.margin * 2,
     config.board.height - config.board.margin * 2
   )
@@ -44,6 +48,17 @@ export const drawPlayfieldBackground = (ctx: CanvasRenderingContext2D) => {
 export const drawUI = (ctx: CanvasRenderingContext2D, gameCore: GameCore) => {
   renderNextShapes(ctx, gameCore)
   renderStats(ctx, gameCore)
+}
+
+export const clearCanvas = (ctx: CanvasRenderingContext2D) => {
+  const ratio = window.devicePixelRatio
+  const canvasWidth = ctx.canvas.width / ratio
+  const canvasHeight = ctx.canvas.height / ratio
+
+  ctx.save()
+  ctx.fillStyle = '#fafafa'
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight)
+  ctx.restore()
 }
 
 const renderNextShapes = (ctx: CanvasRenderingContext2D, gameCore: GameCore) => {
@@ -119,6 +134,9 @@ const drawGhostBrick = (ctx: CanvasRenderingContext2D, x: number, y: number, col
 }
 
 const drawBrick = (ctx: CanvasRenderingContext2D, x: number, y: number, color: number) => {
+  if (y < 0) {
+    return
+  }
   const image = imageLoader.getBrickByColor(color)
   if (image) {
     ctx.drawImage(

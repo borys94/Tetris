@@ -13,15 +13,29 @@ export default abstract class State<StateType extends string> {
   abstract handleInput(inputs: InputType[]): void
   abstract render(ctx: CanvasRenderingContext2D): void
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  handleMouseMove(x: number, y: number): void {
+    // Default implementation does nothing
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  handleMouseClick(x: number, y: number): void {
+    // Default implementation does nothing
+  }
+
   enter() {
     this.transition = null
   }
 
-  protected setTransition(transition: StateType | null) {
-    this.transition = transition
+  exit() {
+    // Default implementation does nothing
   }
 
   getTransition(): StateType | null {
     return this.transition
+  }
+
+  protected setTransition(transition: StateType | null) {
+    this.transition = transition
   }
 }

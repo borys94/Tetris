@@ -1,16 +1,27 @@
 import type GameCore from '../../core/gameCore'
 import type { InputType } from '../../inputHandler'
 import { GameStateType } from '../gameStateMachine'
-import { drawPlayfieldBackground, drawUI } from '../../helpers/rendering'
+import { clearCanvas, drawPlayfieldBackground, drawUI } from '../../helpers/rendering'
 import State from '../state'
 import { PlayingStateMachine } from './playingStateMachine'
+import { Button } from '../../ui'
+import config from '../../config'
 
 export default class PlayingState extends State<GameStateType> {
   private stateMachine: PlayingStateMachine
+  private pauseButton: Button
 
   constructor(gameCore: GameCore) {
     super(gameCore)
     this.stateMachine = new PlayingStateMachine(gameCore)
+
+    this.pauseButton = new Button({
+      x: config.board.width + config.rightPanel.margin,
+      y: config.board.height - config.rightPanel.margin - 50,
+      text: 'Pause',
+      fontSize: 24,
+      onClick: () => this.setTransition(GameStateType.PAUSED),
+    })
   }
 
   update(deltaTime: number): void {
@@ -19,6 +30,7 @@ export default class PlayingState extends State<GameStateType> {
       return
     }
 
+    this.pauseButton.update(deltaTime)
     this.stateMachine.update(deltaTime)
   }
 
@@ -32,18 +44,19 @@ export default class PlayingState extends State<GameStateType> {
   }
 
   render(ctx: CanvasRenderingContext2D): void {
+    clearCanvas(ctx)
     drawPlayfieldBackground(ctx)
     drawUI(ctx, this.gameCore)
+    this.pauseButton.render(ctx)
     this.stateMachine.render(ctx)
   }
 
-  enter(): void {
-    super.enter()
-    console.log('Entering Playing State')
+  handleMouseMove(x: number, y: number): void {
+    this.pauseButton.handleMouseMove(x, y)
   }
 
-  exit(): void {
-    console.log('Exiting Playing State')
+  handleMouseClick(x: number, y: number): void {
+    this.pauseButton.handleMouseClick(x, y)
   }
 
   isGameOver(): boolean {
