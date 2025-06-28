@@ -17,12 +17,10 @@ export default class FallingState extends State<PlayingStateType> {
   private continuousMoveType: ContinousMoveType = null
 
   update(deltaTime: number): void {
-    console.log('update')
     this.dropTimer += deltaTime
 
     // Auto-drop based on level
     const currentLevel = this.gameCore.getLevel().getLevel()
-    console.log(currentLevel)
     this.dropInterval = Math.max(50, 800 - (currentLevel - 1) * 50)
 
     const dropInterval = this.softDropping ? this.softDropInterval : this.dropInterval

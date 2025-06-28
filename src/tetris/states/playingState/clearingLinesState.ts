@@ -124,6 +124,8 @@ export default class ClearingLinesState extends State<PlayingStateType> {
     } else {
       // Regular line clear
       switch (linesCleared) {
+        case 0:
+          break
         case 1:
           this.gameCore.getScoring().addSingleLine()
           break
@@ -133,7 +135,7 @@ export default class ClearingLinesState extends State<PlayingStateType> {
         case 3:
           this.gameCore.getScoring().addTripleLine()
           break
-        case 4:
+        default:
           this.gameCore.getScoring().addTetris()
           break
       }

@@ -12,7 +12,7 @@ export default class Playfield {
     this.grid = this.createEmptyGrid(width, height)
   }
 
-  getWidth() {
+  getWidth(): number {
     return this.width
   }
 
