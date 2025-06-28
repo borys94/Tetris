@@ -68,6 +68,11 @@ export default class Playfield {
   }
 
   private createEmptyGrid(width: number, height: number) {
-    return Array.from({ length: height }, () => Array(width).fill(0))
+    return [
+      ...Array.from({ length: height - 3 }, () => Array(width).fill(0)),
+      [1, 1, 1, 1, 0, 0, 1, 1, 1, 1],
+      [1, 1, 1, 1, 0, 0, 0, 1, 1, 1],
+      [1, 1, 1, 1, 1, 0, 1, 1, 1, 1],
+    ]
   }
 }

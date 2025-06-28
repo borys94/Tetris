@@ -4,6 +4,7 @@ import Playfield from './playfield'
 import ActiveTetromino from './tetrominos/activeTetromino'
 import { TetrominoType } from './tetrominos/shapes'
 import TetrominoMover from './tetrominoMover'
+import type { TSpinResult } from './tSpinDetector'
 
 const QUEUE_SIZE = 4
 
@@ -12,42 +13,56 @@ export default class Board {
   private playfield: Playfield
   private tetrominoQueue: Tetromino[]
   private activeTetromino: ActiveTetromino
+  private tetrominoMover: TetrominoMover
 
   constructor() {
     this.playfield = new Playfield(config.board.bricksX, config.board.bricksY)
     this.tetrominoQueue = this.generateQueue()
     this.activeTetromino = this.nextTetromino()
+    this.tetrominoMover = new TetrominoMover(this.playfield, this.activeTetromino)
   }
 
   moveDown() {
-    return new TetrominoMover(this.playfield, this.activeTetromino).moveDown()
+    return this.tetrominoMover.moveDown()
   }
 
   moveLeft() {
-    return new TetrominoMover(this.playfield, this.activeTetromino).moveLeft()
+    return this.tetrominoMover.moveLeft()
   }
 
   moveRight() {
-    return new TetrominoMover(this.playfield, this.activeTetromino).moveRight()
+    return this.tetrominoMover.moveRight()
   }
 
   rotateRight() {
-    return new TetrominoMover(this.playfield, this.activeTetromino).rotateRight()
+    return this.tetrominoMover.rotateRight()
   }
 
   rotateLeft() {
-    return new TetrominoMover(this.playfield, this.activeTetromino).rotateLeft()
+    console.log('rotateLeft')
+    return this.tetrominoMover.rotateLeft()
   }
 
   mergeActiveTetromino() {
     this.playfield.merge(this.activeTetromino)
+  }
+
+  spawnTetromino() {
     this.activeTetromino = this.nextTetromino()
+    this.tetrominoMover = new TetrominoMover(this.playfield, this.activeTetromino)
   }
 
   hasCollisionInNextStep() {
     const moved = this.activeTetromino.clone()
     moved.moveDown()
     return this.playfield.hasCollision(moved)
+  }
+
+  /**
+   * Detect T-Spin after a rotation
+   */
+  detectTSpin(): TSpinResult {
+    return this.tetrominoMover.detectTSpin()
   }
 
   getPlayfield() {
@@ -74,7 +89,10 @@ export default class Board {
   }
 
   private generateQueue() {
-    return Array.from({ length: QUEUE_SIZE }, () => this.generateTetromino())
+    return [
+      new Tetromino(TetrominoType.TShape, 1),
+      ...Array.from({ length: QUEUE_SIZE - 1 }, () => this.generateTetromino())
+    ]
   }
 
   private nextTetromino() {

@@ -25,13 +25,14 @@ export default class PlayingState extends State<GameStateType> {
   }
 
   update(deltaTime: number): void {
-    if (this.isGameOver()) {
-      this.setTransition(GameStateType.GAME_OVER)
-      return
-    }
+    // if (this.isGameOver()) {
+    //   this.setTransition(GameStateType.GAME_OVER)
+    //   return
+    // }
 
     this.pauseButton.update(deltaTime)
     this.stateMachine.update(deltaTime)
+    this.gameCore.updateEffects(deltaTime)
   }
 
   handleInput(inputs: InputType[]): void {
@@ -49,6 +50,7 @@ export default class PlayingState extends State<GameStateType> {
     drawUI(ctx, this.gameCore)
     this.pauseButton.render(ctx)
     this.stateMachine.render(ctx)
+    this.gameCore.renderEffects(ctx)
   }
 
   handleMouseMove(x: number, y: number): void {

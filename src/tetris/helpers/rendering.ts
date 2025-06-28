@@ -96,7 +96,9 @@ const renderStats = (ctx: CanvasRenderingContext2D, gameCore: GameCore) => {
   ctx.fillText(`Score`, boardWidth + margin, height - margin - 250)
   ctx.fillText(`Level`, boardWidth + margin, height - margin - 200)
   ctx.fillText(`Lines`, boardWidth + margin, height - margin - 150)
-  ctx.fillText(`Time`, boardWidth + margin, height - margin - 100)
+  ctx.fillText(`Combo`, boardWidth + margin, height - margin - 100)
+  ctx.fillText(`B2B`, boardWidth + margin, height - margin - 50)
+  // ctx.fillText(`Time`, boardWidth + margin, height - margin)
 
   ctx.textAlign = 'right'
   ctx.fillText(
@@ -114,10 +116,20 @@ const renderStats = (ctx: CanvasRenderingContext2D, gameCore: GameCore) => {
     boardWidth + width - margin,
     height - margin - 150
   )
+  ctx.fillText(
+    `${gameCore.getScoring().getCombo()}`,
+    boardWidth + width - margin,
+    height - margin - 100
+  )
+  ctx.fillText(
+    gameCore.getScoring().isBackToBack() ? 'YES' : 'NO',
+    boardWidth + width - margin,
+    height - margin - 50
+  )
   // ctx.fillText(
   //   `${this.formatTime(this.game.gameTime)}`,
   //   width - margin,
-  //   height - margin - 100
+  //   height - margin
   // )
 }
 

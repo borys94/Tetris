@@ -17,11 +17,13 @@ export default class FallingState extends State<PlayingStateType> {
   private continuousMoveType: ContinousMoveType = null
 
   update(deltaTime: number): void {
+    console.log('update')
     this.dropTimer += deltaTime
 
     // Auto-drop based on level
     const currentLevel = this.gameCore.getLevel().getLevel()
-    this.dropInterval = Math.max(50, 1000 - (currentLevel - 1) * 50)
+    console.log(currentLevel)
+    this.dropInterval = Math.max(50, 800 - (currentLevel - 1) * 50)
 
     const dropInterval = this.softDropping ? this.softDropInterval : this.dropInterval
 
@@ -100,6 +102,11 @@ export default class FallingState extends State<PlayingStateType> {
 
         if (this.gameCore.getBoard().getPlayfield().hasLineToClear()) {
           this.setTransition(PlayingStateType.CLEARING_LINES)
+        } else {
+          // No lines cleared, reset combo
+          this.gameCore.getScoring().setCombo(0)
+          this.setTransition(PlayingStateType.FALLING)
+          board.spawnTetromino()
         }
       }
     } else {

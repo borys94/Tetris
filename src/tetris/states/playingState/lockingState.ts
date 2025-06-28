@@ -40,6 +40,9 @@ export default class LockingState extends State<PlayingStateType> {
     if (this.gameCore.getBoard().getPlayfield().hasLineToClear()) {
       this.setTransition(PlayingStateType.CLEARING_LINES)
     } else {
+      // No lines cleared, reset combo
+      this.gameCore.getScoring().setCombo(0)
+      this.gameCore.getBoard().spawnTetromino()
       this.setTransition(PlayingStateType.FALLING)
     }
   }

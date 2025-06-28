@@ -2,6 +2,7 @@ import config from '../../config'
 import imageLoader from '../../imageLoader'
 import State from '../state'
 import { PlayingStateType } from './playingStateMachine'
+import { TSpinEffect } from '../../effects/tSpinEffect'
 
 export default class ClearingLinesState extends State<PlayingStateType> {
   private clearTimer: number = 0
@@ -12,8 +13,15 @@ export default class ClearingLinesState extends State<PlayingStateType> {
     this.clearTimer += deltaTime
 
     if (this.clearTimer >= this.clearDelay) {
-      // Clear the lines
+      // Detect T-spin before clearing lines
+      this.detectAndAwardTSpin()
+      
+      // Clear the lines and update level
+      const linesCleared = this.linesToClear.length
       this.gameCore.getBoard().getPlayfield().clearLines()
+      this.gameCore.getLevel().addClearedLines(linesCleared)
+      this.gameCore.getBoard().spawnTetromino()
+      
       this.setTransition(PlayingStateType.FALLING)
     }
   }
@@ -58,6 +66,81 @@ export default class ClearingLinesState extends State<PlayingStateType> {
     super.enter()
     this.clearTimer = 0
     this.linesToClear = this.getLinesToClear()
+  }
+
+  /**
+   * Detect T-spin and award appropriate points
+   */
+  private detectAndAwardTSpin(): void {
+    const board = this.gameCore.getBoard()
+    const tSpinResult = board.detectTSpin()
+    const linesCleared = this.linesToClear.length
+
+    // Update combo - if lines are cleared, increment combo
+    if (linesCleared > 0) {
+      const currentCombo = this.gameCore.getScoring().getCombo()
+      this.gameCore.getScoring().setCombo(currentCombo + 1)
+    }
+
+    // Note: Combo is reset when no lines are cleared (handled in LockingState and FallingState)
+
+    if (tSpinResult.isTSpin) {
+      // Add T-spin effect
+      this.gameCore.addEffect(new TSpinEffect(this.gameCore, 'T-Spin', linesCleared))
+      
+      // Full T-spin
+      switch (linesCleared) {
+        case 1:
+          this.gameCore.getScoring().addTSpinSingle()
+          break
+        case 2:
+          this.gameCore.getScoring().addTSpinDouble()
+          break
+        case 3:
+          this.gameCore.getScoring().addTSpinTriple()
+          break
+        default:
+          // T-spin with no lines cleared (rare but possible)
+          this.gameCore.getScoring().addTSpinSingle()
+          break
+      }
+    } else if (tSpinResult.isMiniTSpin) {
+      // Add Mini T-spin effect
+      this.gameCore.addEffect(new TSpinEffect(this.gameCore, 'Mini T-Spin', linesCleared))
+      
+      // Mini T-spin
+      switch (linesCleared) {
+        case 1:
+          this.gameCore.getScoring().addMiniTSpinSingle()
+          break
+        case 2:
+          this.gameCore.getScoring().addMiniTSpinDouble()
+          break
+        default:
+          // Mini T-spin with no lines cleared
+          this.gameCore.getScoring().addMiniTSpinSingle()
+          break
+      }
+    } else {
+      // Regular line clear
+      switch (linesCleared) {
+        case 1:
+          this.gameCore.getScoring().addSingleLine()
+          break
+        case 2:
+          this.gameCore.getScoring().addDoubleLine()
+          break
+        case 3:
+          this.gameCore.getScoring().addTripleLine()
+          break
+        case 4:
+          this.gameCore.getScoring().addTetris()
+          break
+      }
+    }
+
+    // Add combo points if applicable
+    this.gameCore.getScoring().addComboPoints()
   }
 
   private getLinesToClear() {
