@@ -47,6 +47,7 @@ export const drawPlayfieldBackground = (
 
 export const drawUI = (ctx: CanvasRenderingContext2D, gameCore: GameCore) => {
   renderNextShapes(ctx, gameCore)
+  renderHeldTetromino(ctx, gameCore)
   renderStats(ctx, gameCore)
 }
 
@@ -168,5 +169,54 @@ const drawBrick = (ctx: CanvasRenderingContext2D, x: number, y: number, color: n
       config.board.brickSize,
       config.board.brickSize
     )
+  }
+}
+
+const renderHeldTetromino = (ctx: CanvasRenderingContext2D, gameCore: GameCore) => {
+  const heldTetromino = gameCore.getBoard().getHeldTetromino()
+  const canHold = gameCore.getBoard().canHoldTetromino()
+  const boardWidth = config.board.width
+  const brickSize = config.board.brickSize / 2
+
+  // Draw "HOLD" label
+  ctx.fillStyle = '#44bec7'
+  ctx.font = `16px Game`
+  ctx.textAlign = 'left'
+  ctx.fillText('HOLD', boardWidth + 10, 230)
+
+  if (heldTetromino) {
+    const blocks = heldTetromino.getBlocks()
+    
+    // Center the tetromino in the hold area
+    const minX = Math.min(...blocks.map(([x]) => x))
+    const maxX = Math.max(...blocks.map(([x]) => x))
+    const minY = Math.min(...blocks.map(([, y]) => y))
+    const maxY = Math.max(...blocks.map(([, y]) => y))
+    
+    const offsetX = (4 - (maxX - minX + 1)) / 2
+    const offsetY = (4 - (maxY - minY + 1)) / 2
+
+    // Make held tetromino semi-transparent if can't hold
+    if (!canHold) {
+      ctx.globalAlpha = 0.5
+    }
+
+    blocks.forEach(([x, y, color]) => {
+      const brickImg = imageLoader.getBrickByColor(color)
+      if (brickImg) {
+        ctx.drawImage(
+          brickImg,
+          boardWidth + (x - minX + offsetX) * brickSize,
+          (y - minY + offsetY) * brickSize + 230,
+          brickSize,
+          brickSize
+        )
+      }
+    })
+
+    // Reset alpha
+    if (!canHold) {
+      ctx.globalAlpha = 1.0
+    }
   }
 }

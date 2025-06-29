@@ -3,11 +3,19 @@ import imageLoader from '../../imageLoader'
 import State from '../state'
 import { PlayingStateType } from './playingStateMachine'
 import { TSpinEffect } from '../../effects/tSpinEffect'
+import type PlayingState from './index'
+import type GameCore from '../../core/gameCore'
 
 export default class ClearingLinesState extends State<PlayingStateType> {
   private clearTimer: number = 0
   private clearDelay: number = 300 // Time to show lines before clearing
   private linesToClear: number[] = []
+  private playingState: PlayingState
+
+  constructor(gameCore: GameCore, playingState: PlayingState) {
+    super(gameCore)
+    this.playingState = playingState
+  }
 
   update(deltaTime: number): void {
     this.clearTimer += deltaTime
@@ -15,13 +23,13 @@ export default class ClearingLinesState extends State<PlayingStateType> {
     if (this.clearTimer >= this.clearDelay) {
       // Detect T-spin before clearing lines
       this.detectAndAwardTSpin()
-      
+
       // Clear the lines and update level
       const linesCleared = this.linesToClear.length
       this.gameCore.getBoard().getPlayfield().clearLines()
       this.gameCore.getLevel().addClearedLines(linesCleared)
       this.gameCore.getBoard().spawnTetromino()
-      
+
       this.setTransition(PlayingStateType.FALLING)
     }
   }
@@ -86,8 +94,8 @@ export default class ClearingLinesState extends State<PlayingStateType> {
 
     if (tSpinResult.isTSpin) {
       // Add T-spin effect
-      this.gameCore.addEffect(new TSpinEffect(this.gameCore, 'T-Spin', linesCleared))
-      
+      this.playingState.addEffect(new TSpinEffect(this.gameCore, 'T-Spin', linesCleared))
+
       // Full T-spin
       switch (linesCleared) {
         case 1:
@@ -106,8 +114,8 @@ export default class ClearingLinesState extends State<PlayingStateType> {
       }
     } else if (tSpinResult.isMiniTSpin) {
       // Add Mini T-spin effect
-      this.gameCore.addEffect(new TSpinEffect(this.gameCore, 'Mini T-Spin', linesCleared))
-      
+      this.playingState.addEffect(new TSpinEffect(this.gameCore, 'Mini T-Spin', linesCleared))
+
       // Mini T-spin
       switch (linesCleared) {
         case 1:

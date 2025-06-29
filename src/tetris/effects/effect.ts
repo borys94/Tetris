@@ -7,7 +7,6 @@ export abstract class Effect {
 
   constructor(protected game: GameCore) {}
 
-  abstract enter(): void
   abstract render(ctx: CanvasRenderingContext2D): void
 
   update(deltaTime: number) {

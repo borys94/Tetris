@@ -8,7 +8,7 @@ type ContinousMoveType = 'left' | 'right' | 'rotateRight' | 'rotateLeft' | null
 
 export default class LockingState extends State<PlayingStateType> {
   private lockTimer: number = 0
-  private lockDelay: number = 700 // 500ms to allow for last-minute moves
+  private lockDelay: number = 700 // 700ms to allow for last-minute moves
 
   private continuousMoveType: ContinousMoveType = null
   private moveTimer: number = 0
@@ -17,39 +17,19 @@ export default class LockingState extends State<PlayingStateType> {
   update(deltaTime: number): void {
     this.lockTimer += deltaTime
 
-    if (!this.gameCore.getBoard().hasCollisionInNextStep()) {
+    if (this.board.canActiveTetrominoMoveDown()) {
       this.setTransition(PlayingStateType.FALLING)
       return
     }
 
-    // Handle continuous movement
-    if (this.continuousMoveType) {
-      this.moveTimer += deltaTime
-      if (this.moveTimer >= this.moveInterval) {
-        this.moveTimer = 0
-        this.performContinuousMove(this.continuousMoveType)
-      }
-    }
-
-    if (this.lockTimer < this.lockDelay) {
-      return
-    }
-
-    this.gameCore.getBoard().mergeActiveTetromino()
-
-    if (this.gameCore.getBoard().getPlayfield().hasLineToClear()) {
-      this.setTransition(PlayingStateType.CLEARING_LINES)
+    if (this.lockTimer >= this.lockDelay) {
+      this.handleLockDelayExpired()
     } else {
-      // No lines cleared, reset combo
-      this.gameCore.getScoring().setCombo(0)
-      this.gameCore.getBoard().spawnTetromino()
-      this.setTransition(PlayingStateType.FALLING)
+      this.updateContinuousMove(deltaTime)
     }
-  }
+  }  
 
   handleInput(inputs: InputType[]): void {
-    const board = this.gameCore.getBoard()
-
     if (
       !inputs.includes('ArrowLeft') &&
       !inputs.includes('ArrowRight') &&
@@ -73,24 +53,54 @@ export default class LockingState extends State<PlayingStateType> {
       this.setContinuousMoveType('rotateLeft')
     }
 
+    // Hold tetromino
+    if (inputs.includes('KeyC')) {
+      this.board.holdTetromino()
+    }
+
     if (inputs.includes('ArrowDown')) {
       // Soft drop during lock delay
-      board.moveDown()
-      this.gameCore.getScoring().addSoftDropPoints(1)
+      this.board.moveDown()
+      this.scoring.addSoftDropPoints(1)
       this.lockTimer = 0 // Reset lock timer
     }
   }
 
   render(ctx: CanvasRenderingContext2D): void {
-    drawPlayfield(ctx, this.gameCore.getBoard().getPlayfield())
-    drawTetromino(ctx, this.gameCore.getBoard().getActiveTetromino(), true)
-    // drawTetromino(ctx, this.gameCore.getBoard().getGhostTetromino(), true)
+    drawPlayfield(ctx, this.board.getPlayfield())
+    drawTetromino(ctx, this.board.getActiveTetromino(), true)
   }
 
   enter(): void {
     super.enter()
     this.lockTimer = 0
     this.moveTimer = 0
+  }
+
+  private handleLockDelayExpired(): void {
+    this.board.mergeActiveTetromino()
+
+    if (this.board.getPlayfield().hasLineToClear()) {
+      this.setTransition(PlayingStateType.CLEARING_LINES)
+    } else {
+      this.handleNoLinesCleared()
+    }
+  }
+
+  private handleNoLinesCleared(): void {
+    this.scoring.setCombo(0)
+    this.board.spawnTetromino()
+    this.setTransition(PlayingStateType.FALLING)
+  }
+
+  private updateContinuousMove(deltaTime: number): void {
+    if (this.continuousMoveType) {
+      this.moveTimer += deltaTime
+      if (this.moveTimer >= this.moveInterval) {
+        this.moveTimer = 0
+        this.performContinuousMove(this.continuousMoveType)
+      }
+    }
   }
 
   private setContinuousMoveType(continuousMoveType: ContinousMoveType): void {
@@ -104,16 +114,16 @@ export default class LockingState extends State<PlayingStateType> {
   private performContinuousMove(continuousMoveType: ContinousMoveType): void {
     switch (continuousMoveType) {
       case 'left':
-        this.gameCore.getBoard().moveLeft()
+        this.board.moveLeft()
         break
       case 'right':
-        this.gameCore.getBoard().moveRight()
+        this.board.moveRight()
         break
       case 'rotateRight':
-        this.gameCore.getBoard().rotateRight()
+        this.board.rotateRight()
         break
       case 'rotateLeft':
-        this.gameCore.getBoard().rotateLeft()
+        this.board.rotateLeft()
         break
     }
   }

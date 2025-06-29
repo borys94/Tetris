@@ -33,6 +33,12 @@ class TetrominoMover {
     return this.performRotation('rotateLeft')
   }
 
+  canMoveDown() {
+    const moved = this.tetromino.clone()
+    moved.moveDown()
+    return this.playfield.hasCollision(moved)
+  }
+
   /**
    * Detect T-Spin after a rotation
    */

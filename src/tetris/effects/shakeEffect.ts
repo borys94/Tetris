@@ -1,52 +1,35 @@
-import { cloneCanvas, clearCanvas, drawCanvas } from '../helpers/canvas'
+import config from '../config'
+import type GameCore from '../core/gameCore'
+import { clearCanvas, drawCanvas, cutCanvas } from '../helpers/canvas'
 import { Effect } from './effect'
 
-abstract class ShakeEffect extends Effect {
+export class ShakeEffect extends Effect {
   protected duration = 200
-  protected movedCanvas = document.createElement('canvas')
+  private sideFactor = 0
+  private topFactor = 0
 
-  enter(): void {}
+  constructor(gameCore: GameCore, direction: 'left' | 'right' | 'top' | 'bottom') {
+    super(gameCore)
+    if (direction === 'left') {
+      this.sideFactor = -1
+    } else if (direction === 'right') {
+      this.sideFactor = 1
+    } else if (direction === 'top') {
+      this.topFactor = -1
+    } else if (direction === 'bottom') {
+      this.topFactor = 1
+    }
+  }
 
-  render(ctx: CanvasRenderingContext2D) {
-    cloneCanvas(ctx.canvas, this.movedCanvas)
-    clearCanvas(ctx.canvas)
-    drawCanvas(ctx, this.movedCanvas, this.getLeft(), this.getTop())
+  render(ctx: CanvasRenderingContext2D) {    
+    const shakeFactor = this.getShakeFactor()
+    const shakedCanvas =  cutCanvas(ctx.canvas, 0, 0, config.board.width, config.board.height)
+    clearCanvas(ctx.canvas, 0, 0, config.board.width, config.board.height)
+    drawCanvas(ctx, shakedCanvas, this.sideFactor * shakeFactor, this.topFactor * shakeFactor)
   }
 
   protected getShakeFactor() {
     const progresses = [0, 5, 2, 4, 1]
     return progresses[Math.floor(this.progress * progresses.length)]
-  }
-
-  abstract getLeft(): number
-  abstract getTop(): number
-}
-
-export class ShakeLeftEffect extends ShakeEffect {
-  getLeft() {
-    return this.getShakeFactor() * -1
-  }
-
-  getTop() {
-    return 0
-  }
-}
-
-export class ShakeRightEffect extends ShakeEffect {
-  getLeft() {
-    return this.getShakeFactor()
-  }
-
-  getTop() {
-    return 0
-  }
-}
-export class ShakeDownEffect extends ShakeEffect {
-  getLeft() {
-    return 0
-  }
-
-  getTop() {
-    return this.getShakeFactor()
   }
 }

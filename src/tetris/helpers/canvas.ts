@@ -19,7 +19,8 @@ export const setHighDpiCanvas = (canvas: HTMLCanvasElement, width: number, heigh
   canvas.getContext('2d')?.scale(ratio, ratio)
 }
 
-export const cloneCanvas = (canvas: HTMLCanvasElement, newCanvas: HTMLCanvasElement) => {
+export const cloneCanvas = (canvas: HTMLCanvasElement) => {
+  const newCanvas = document.createElement('canvas')
   newCanvas.width = canvas.width
   newCanvas.height = canvas.height
   newCanvas.style.width = canvas.style.width
@@ -28,8 +29,14 @@ export const cloneCanvas = (canvas: HTMLCanvasElement, newCanvas: HTMLCanvasElem
   return newCanvas
 }
 
-export const clearCanvas = (canvas: HTMLCanvasElement) => {
-  canvas.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height)
+export const clearCanvas = (
+  canvas: HTMLCanvasElement,
+  x: number = 0,
+  y: number = 0,
+  width: number = canvas.width,
+  height: number = canvas.height
+) => {
+  canvas.getContext('2d')?.clearRect(x, y, width, height)
 }
 
 export const drawCanvas = (
@@ -51,4 +58,35 @@ export const getCanvasSize = (canvas: HTMLCanvasElement) => {
     width: canvas.width / ratio,
     height: canvas.height / ratio,
   }
+}
+
+export const cutCanvas = (
+  canvas: HTMLCanvasElement,
+  x: number,
+  y: number,
+  width: number,
+  height: number
+) => {
+  const newCanvas = document.createElement('canvas')
+  const ctx = newCanvas.getContext('2d') as CanvasRenderingContext2D
+  const ratio = window.devicePixelRatio
+
+  newCanvas.width = width * ratio
+  newCanvas.height = height * ratio
+  newCanvas.style.width = width + 'px'
+  newCanvas.style.height = height + 'px'
+
+  ctx.drawImage(
+    canvas,
+    x * ratio,
+    y * ratio,
+    width * ratio,
+    height * ratio,
+    0,
+    0,
+    width * ratio,
+    height * ratio
+  )
+
+  return newCanvas
 }

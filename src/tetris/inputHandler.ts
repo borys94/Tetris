@@ -7,6 +7,7 @@ const INPUTS = [
   'Escape',
   'KeyP',
   'KeyZ', // rotate left
+  'KeyC', // hold tetromino
 ] as const
 
 export type InputType = (typeof INPUTS)[number]

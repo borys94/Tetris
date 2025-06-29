@@ -6,14 +6,16 @@ import State from '../state'
 import { PlayingStateMachine } from './playingStateMachine'
 import { Button } from '../../ui'
 import config from '../../config'
+import { Effect } from '../../effects/effect'
 
 export default class PlayingState extends State<GameStateType> {
   private stateMachine: PlayingStateMachine
   private pauseButton: Button
+  private effects: Effect[] = []
 
   constructor(gameCore: GameCore) {
     super(gameCore)
-    this.stateMachine = new PlayingStateMachine(gameCore)
+    this.stateMachine = new PlayingStateMachine(gameCore, this)
 
     this.pauseButton = new Button({
       x: config.board.width + config.rightPanel.margin,
@@ -32,7 +34,7 @@ export default class PlayingState extends State<GameStateType> {
 
     this.pauseButton.update(deltaTime)
     this.stateMachine.update(deltaTime)
-    this.gameCore.updateEffects(deltaTime)
+    this.updateEffects(deltaTime)
   }
 
   handleInput(inputs: InputType[]): void {
@@ -50,7 +52,7 @@ export default class PlayingState extends State<GameStateType> {
     drawUI(ctx, this.gameCore)
     this.pauseButton.render(ctx)
     this.stateMachine.render(ctx)
-    this.gameCore.renderEffects(ctx)
+    this.renderEffects(ctx)
   }
 
   handleMouseMove(x: number, y: number): void {
@@ -61,9 +63,24 @@ export default class PlayingState extends State<GameStateType> {
     this.pauseButton.handleMouseClick(x, y)
   }
 
+  addEffect(effect: Effect) {
+    this.effects.push(effect)
+  }
+
   isGameOver(): boolean {
     const board = this.gameCore.getBoard()
     const activeTetromino = board.getActiveTetromino()
     return board.getPlayfield().hasCollision(activeTetromino)
+  }
+
+  private updateEffects(deltaTime: number) {
+    this.effects = this.effects.filter((effect) => {
+      effect.update(deltaTime)
+      return !effect.isFinished()
+    })
+  }
+
+  private renderEffects(ctx: CanvasRenderingContext2D) {
+    this.effects.forEach((effect) => effect.render(ctx))
   }
 }

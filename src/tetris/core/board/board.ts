@@ -14,6 +14,8 @@ export default class Board {
   private tetrominoQueue: Tetromino[]
   private activeTetromino: ActiveTetromino
   private tetrominoMover: TetrominoMover
+  private heldTetromino: Tetromino | null = null
+  private canHold: boolean = true
 
   constructor() {
     this.playfield = new Playfield(config.board.bricksX, config.board.bricksY)
@@ -39,8 +41,11 @@ export default class Board {
   }
 
   rotateLeft() {
-    console.log('rotateLeft')
     return this.tetrominoMover.rotateLeft()
+  }
+
+  canActiveTetrominoMoveDown() {
+    return this.tetrominoMover.canMoveDown()
   }
 
   mergeActiveTetromino() {
@@ -50,17 +55,32 @@ export default class Board {
   spawnTetromino() {
     this.activeTetromino = this.nextTetromino()
     this.tetrominoMover = new TetrominoMover(this.playfield, this.activeTetromino)
+    this.canHold = true
   }
 
-  hasCollisionInNextStep() {
-    const moved = this.activeTetromino.clone()
-    moved.moveDown()
-    return this.playfield.hasCollision(moved)
+  holdTetromino(): boolean {
+    if (!this.canHold) {
+      return false
+    }
+
+    const currentTetromino = new Tetromino(this.activeTetromino.getType(), this.activeTetromino.getColor())
+    
+    if (this.heldTetromino) {
+      // Swap with held tetromino
+      this.activeTetromino = new ActiveTetromino(this.heldTetromino)
+      this.heldTetromino = currentTetromino
+    } else {
+      // First hold - just store the current tetromino and get next from queue
+      this.heldTetromino = currentTetromino
+      this.activeTetromino = this.nextTetromino()
+    }
+    
+    this.tetrominoMover = new TetrominoMover(this.playfield, this.activeTetromino)
+    this.canHold = false
+    
+    return true
   }
 
-  /**
-   * Detect T-Spin after a rotation
-   */
   detectTSpin(): TSpinResult {
     return this.tetrominoMover.detectTSpin()
   }
@@ -77,15 +97,12 @@ export default class Board {
     return this.activeTetromino
   }
 
-  getGhostTetromino() {
-    let ghostTetromino = this.activeTetromino.clone()
-    const moved = ghostTetromino.clone()
-    while (!this.playfield.hasCollision(moved)) {
-      ghostTetromino = moved.clone()
-      moved.moveDown()
-    }
+  getHeldTetromino() {
+    return this.heldTetromino
+  }
 
-    return ghostTetromino
+  canHoldTetromino() {
+    return this.canHold
   }
 
   private generateQueue() {
@@ -100,7 +117,7 @@ export default class Board {
     if (!topTetromino) {
       throw new Error('No tetromino in queue. Should not happen')
     }
-    this.tetrominoQueue.push(this.generateTetromino())
+    this.tetrominoQueue = [...this.tetrominoQueue, this.generateTetromino()]
     return new ActiveTetromino(topTetromino)
   }
 

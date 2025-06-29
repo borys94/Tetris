@@ -5,10 +5,12 @@ import {
   createAllMocks, 
   resetAllMocks, 
   createMockCanvasRenderingContext2D,
+  createMockPlayingState,
   type MockBoard,
   type MockScoring,
   type MockPlayfield
 } from './mocks'
+import type PlayingState from '../index'
 
 describe('FallingState', () => {
   let fallingState: FallingState
@@ -27,13 +29,13 @@ describe('FallingState', () => {
     mockPlayfield = mocks.playfield
 
     // Create FallingState instance
-    fallingState = new FallingState(mocks.gameCore)
+    fallingState = new FallingState(mocks.gameCore, createMockPlayingState() as unknown as PlayingState)
   })
 
   describe('update', () => {
     it('should move tetromino down when drop timer reaches interval', () => {
       // Arrange
-      mockBoard.hasCollisionInNextStep.mockReturnValue(false)
+      mockBoard.canActiveTetrominoMoveDown.mockReturnValue(false)
 
       // Act - simulate enough time for a drop
       fallingState.update(1000) // 1 second
@@ -44,7 +46,7 @@ describe('FallingState', () => {
 
     it('should transition to LOCKING state when tetromino collides after moving down', () => {
       // Arrange
-      mockBoard.hasCollisionInNextStep
+      mockBoard.canActiveTetrominoMoveDown
         .mockReturnValueOnce(false) // First call - no collision
         .mockReturnValueOnce(true) // Second call - collision after move
 
@@ -57,7 +59,7 @@ describe('FallingState', () => {
 
     it('should add soft drop points when soft dropping', () => {
       // Arrange
-      mockBoard.hasCollisionInNextStep.mockReturnValue(false)
+      mockBoard.canActiveTetrominoMoveDown.mockReturnValue(false)
 
       // Act - enable soft drop and update
       fallingState.handleInput(['ArrowDown'])
@@ -101,9 +103,17 @@ describe('FallingState', () => {
       expect(mockBoard.rotateLeft).toHaveBeenCalled()
     })
 
+    it('should handle hold tetromino with C key', () => {
+      // Act
+      fallingState.handleInput(['KeyC'])
+
+      // Assert
+      expect(mockBoard.holdTetromino).toHaveBeenCalled()
+    })
+
     it('should handle hard drop with space key', () => {
       // Arrange
-      mockBoard.hasCollisionInNextStep.mockReturnValue(false).mockReturnValue(true)
+      mockBoard.canActiveTetrominoMoveDown.mockReturnValue(false).mockReturnValue(true)
       mockPlayfield.hasLineToClear.mockReturnValue(false)
 
       // Act
@@ -116,7 +126,7 @@ describe('FallingState', () => {
 
     it('should transition to CLEARING_LINES when hard drop clears lines', () => {
       // Arrange
-      mockBoard.hasCollisionInNextStep.mockReturnValue(false).mockReturnValue(true)
+      mockBoard.canActiveTetrominoMoveDown.mockReturnValue(false).mockReturnValue(true)
       mockPlayfield.hasLineToClear.mockReturnValue(true)
 
       // Act
@@ -128,7 +138,7 @@ describe('FallingState', () => {
 
     it('should reset combo when hard drop does not clear lines', () => {
       // Arrange
-      mockBoard.hasCollisionInNextStep.mockReturnValue(false).mockReturnValue(true)
+      mockBoard.canActiveTetrominoMoveDown.mockReturnValue(false).mockReturnValue(true)
       mockPlayfield.hasLineToClear.mockReturnValue(false)
 
       // Act

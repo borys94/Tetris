@@ -20,6 +20,10 @@ export type MockLevel = MockFromClass<Level>
 
 export type MockGameCore = MockFromClass<GameCore>
 
+export type MockPlayingState = {
+  addEffect: ReturnType<typeof vi.fn>
+}
+
 export interface MockContext {
   drawImage: ReturnType<typeof vi.fn>
   fillRect: ReturnType<typeof vi.fn>
@@ -63,12 +67,14 @@ export function createMockBoard(playfield?: MockPlayfield): MockBoard {
     rotateLeft: vi.fn(),
     mergeActiveTetromino: vi.fn(),
     spawnTetromino: vi.fn(),
-    hasCollisionInNextStep: vi.fn(() => false),
+    canActiveTetrominoMoveDown: vi.fn(() => false),
     detectTSpin: vi.fn(() => ({ isTSpin: false, isMiniTSpin: false, cornerCount: 0 })),
     getPlayfield: vi.fn(() => mockPlayfield),
     getTetrominoQueue: vi.fn(() => []),
     getActiveTetromino: vi.fn(),
-    getGhostTetromino: vi.fn(),
+    holdTetromino: vi.fn(),
+    getHeldTetromino: vi.fn(),
+    canHoldTetromino: vi.fn(() => true),
   }
 }
 
@@ -119,7 +125,7 @@ export function createMockGameCore(
     getBoard: vi.fn(() => mockBoard),
     getScoring: vi.fn(() => mockScoring),
     getLevel: vi.fn(() => mockLevel),
-    addEffect: vi.fn(),
+    reset: vi.fn(),
   }
 }
 
@@ -157,5 +163,11 @@ export function createAllMocks() {
     scoring,
     level,
     gameCore: gameCore as unknown as GameCore,
+  }
+}
+
+export function createMockPlayingState(): MockPlayingState {
+  return {
+    addEffect: vi.fn(),
   }
 } 

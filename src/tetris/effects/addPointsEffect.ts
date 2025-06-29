@@ -12,8 +12,6 @@ export class AddPointsEffect extends Effect {
     super(game)
   }
 
-  enter(): void {}
-
   render(ctx: CanvasRenderingContext2D) {
     ctx.save()
     ctx.textAlign = 'center'

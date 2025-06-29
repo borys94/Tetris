@@ -5,30 +5,34 @@ import {
   createAllMocks, 
   resetAllMocks, 
   createMockCanvasRenderingContext2D,
+  createMockPlayingState,
   type MockBoard,
   type MockScoring,
-  type MockPlayfield
+  type MockPlayfield,
+  type MockLevel
 } from './mocks'
+import type PlayingState from '../index'
 
 describe('ClearingLinesState', () => {
   let clearingLinesState: ClearingLinesState
   let mockBoard: MockBoard
   let mockScoring: MockScoring
   let mockPlayfield: MockPlayfield
-  let mocks: ReturnType<typeof createAllMocks>
+  let mockLevel: MockLevel
 
   beforeEach(() => {
     // Reset mocks
     resetAllMocks()
 
     // Create all mocks
-    mocks = createAllMocks()
+    const mocks = createAllMocks()
     mockBoard = mocks.board
     mockScoring = mocks.scoring
     mockPlayfield = mocks.playfield
+    mockLevel = mocks.level
 
     // Create ClearingLinesState instance
-    clearingLinesState = new ClearingLinesState(mocks.gameCore)
+    clearingLinesState = new ClearingLinesState(mocks.gameCore, createMockPlayingState() as unknown as PlayingState)
   })
 
   describe('update', () => {
@@ -51,7 +55,7 @@ describe('ClearingLinesState', () => {
       
       // Assert
       expect(mockPlayfield.clearLines).toHaveBeenCalled()
-      expect(mocks.level.addClearedLines).toHaveBeenCalledWith(10) // 10 full lines
+      expect(mockLevel.addClearedLines).toHaveBeenCalledWith(10) // 10 full lines
       expect(mockBoard.spawnTetromino).toHaveBeenCalled()
     })
 
@@ -106,7 +110,7 @@ describe('ClearingLinesState', () => {
   describe('handleInput', () => {
     it('should not handle any input during line clearing', () => {
       // Act & Assert - should not throw or do anything
-      expect(() => clearingLinesState.handleInput(['ArrowLeft'])).not.toThrow()
+      expect(() => clearingLinesState.handleInput()).not.toThrow()
     })
   })
 

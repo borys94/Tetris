@@ -33,7 +33,7 @@ describe('LockingState', () => {
   describe('update', () => {
     it('should transition to FALLING when tetromino can move down', () => {
       // Arrange
-      mockBoard.hasCollisionInNextStep.mockReturnValue(false)
+      mockBoard.canActiveTetrominoMoveDown.mockReturnValue(true)
       
       // Act
       lockingState.update(100)
@@ -44,7 +44,7 @@ describe('LockingState', () => {
 
     it('should transition to CLEARING_LINES when lines can be cleared', () => {
       // Arrange
-      mockBoard.hasCollisionInNextStep.mockReturnValue(true)
+      mockBoard.canActiveTetrominoMoveDown.mockReturnValue(false)
       mockPlayfield.hasLineToClear.mockReturnValue(true)
       
       // Act - wait for lock delay
@@ -56,7 +56,7 @@ describe('LockingState', () => {
 
     it('should transition to FALLING when no lines can be cleared', () => {
       // Arrange
-      mockBoard.hasCollisionInNextStep.mockReturnValue(true)
+      mockBoard.canActiveTetrominoMoveDown.mockReturnValue(false)
       mockPlayfield.hasLineToClear.mockReturnValue(false)
       
       // Act - wait for lock delay
@@ -68,7 +68,7 @@ describe('LockingState', () => {
 
     it('should merge tetromino and spawn new one after lock delay', () => {
       // Arrange
-      mockBoard.hasCollisionInNextStep.mockReturnValue(true)
+      mockBoard.canActiveTetrominoMoveDown.mockReturnValue(false)
       mockPlayfield.hasLineToClear.mockReturnValue(false)
       
       // Act - wait for lock delay
@@ -81,7 +81,7 @@ describe('LockingState', () => {
 
     it('should reset combo when no lines are cleared', () => {
       // Arrange
-      mockBoard.hasCollisionInNextStep.mockReturnValue(true)
+      mockBoard.canActiveTetrominoMoveDown.mockReturnValue(false)
       mockPlayfield.hasLineToClear.mockReturnValue(false)
       
       // Act - wait for lock delay
@@ -125,6 +125,14 @@ describe('LockingState', () => {
       expect(mockBoard.rotateLeft).toHaveBeenCalled()
     })
 
+    it('should handle hold tetromino with C key', () => {
+      // Act
+      lockingState.handleInput(['KeyC'])
+      
+      // Assert
+      expect(mockBoard.holdTetromino).toHaveBeenCalled()
+    })
+
     it('should handle soft drop during lock delay', () => {
       // Act
       lockingState.handleInput(['ArrowDown'])
@@ -136,7 +144,7 @@ describe('LockingState', () => {
 
     it('should reset lock timer on soft drop', () => {
       // Arrange
-      mockBoard.hasCollisionInNextStep.mockReturnValue(true)
+      mockBoard.canActiveTetrominoMoveDown.mockReturnValue(true)
       
       // Act - advance timer, then soft drop
       lockingState.update(500) // 500ms into lock delay
