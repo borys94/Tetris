@@ -6,7 +6,7 @@ import type { InputType } from '../inputHandler'
 
 export default abstract class State<StateType extends string> {
   private transition: StateType | null = null
-  
+
   protected gameCore: GameCore
   protected board: Board
   protected scoring: Scoring

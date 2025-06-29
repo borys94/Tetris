@@ -6,9 +6,32 @@ const INPUTS = [
   'Space',
   'Escape',
   'KeyP',
-  'KeyZ', // rotate left
-  'KeyC', // hold tetromino
+  'KeyZ',
+  'KeyC',
 ] as const
+
+export type InputKey =
+  | 'LEFT'
+  | 'RIGHT'
+  | 'DOWN'
+  | 'ROTATE_RIGHT'
+  | 'ROTATE_LEFT'
+  | 'HOLD'
+  | 'HARD_DROP'
+  | 'PAUSE'
+  | 'ESCAPE'
+
+export const INPUT_KEYS: Record<InputKey, (typeof INPUTS)[number]> = {
+  LEFT: 'ArrowLeft',
+  RIGHT: 'ArrowRight',
+  DOWN: 'ArrowDown',
+  ROTATE_RIGHT: 'ArrowUp',
+  ROTATE_LEFT: 'KeyZ',
+  HOLD: 'KeyC',
+  HARD_DROP: 'Space',
+  PAUSE: 'KeyP',
+  ESCAPE: 'Escape',
+} as const
 
 export type InputType = (typeof INPUTS)[number]
 

@@ -54,4 +54,4 @@ Object.defineProperty(global, 'window', {
   value: {
     devicePixelRatio: 1,
   },
-}) 
+})

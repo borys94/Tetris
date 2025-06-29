@@ -27,7 +27,7 @@ export default class LockingState extends State<PlayingStateType> {
     } else {
       this.updateContinuousMove(deltaTime)
     }
-  }  
+  }
 
   handleInput(inputs: InputType[]): void {
     if (

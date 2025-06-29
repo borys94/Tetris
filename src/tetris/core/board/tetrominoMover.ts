@@ -36,12 +36,9 @@ class TetrominoMover {
   canMoveDown() {
     const moved = this.tetromino.clone()
     moved.moveDown()
-    return this.playfield.hasCollision(moved)
+    return !this.playfield.hasCollision(moved)
   }
 
-  /**
-   * Detect T-Spin after a rotation
-   */
   detectTSpin(): TSpinResult {
     const detector = new TSpinDetector(this.playfield, this.tetromino)
     return detector.detectTSpin(this.lastMoveRotation)

@@ -153,7 +153,7 @@ describe('TSpinDetector', () => {
       // Arrange
       mockPlayfield.hasCollision.mockReturnValue(true) // Tetromino is locked
       mockPlayfield.getBlocks.mockReturnValue([]) // No placed blocks
-      
+
       // Set T-piece at left edge (x=0) so left corners are outside playfield
       mockTetromino.getBlocks.mockReturnValue([
         [1, 18, 1], // T-piece center (at x=1)
@@ -170,4 +170,4 @@ describe('TSpinDetector', () => {
       expect(result.cornerCount).toBeGreaterThan(0)
     })
   })
-}) 
+})

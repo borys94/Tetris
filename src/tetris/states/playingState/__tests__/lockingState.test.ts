@@ -1,13 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import LockingState from '../lockingState'
 import { PlayingStateType } from '../playingStateMachine'
-import { 
-  createAllMocks, 
-  resetAllMocks, 
+import {
+  createAllMocks,
+  resetAllMocks,
   createMockCanvasRenderingContext2D,
   type MockBoard,
   type MockScoring,
-  type MockPlayfield
+  type MockPlayfield,
 } from './mocks'
 
 describe('LockingState', () => {
@@ -34,10 +34,10 @@ describe('LockingState', () => {
     it('should transition to FALLING when tetromino can move down', () => {
       // Arrange
       mockBoard.canActiveTetrominoMoveDown.mockReturnValue(true)
-      
+
       // Act
       lockingState.update(100)
-      
+
       // Assert
       expect(lockingState.getTransition()).toBe(PlayingStateType.FALLING)
     })
@@ -46,10 +46,10 @@ describe('LockingState', () => {
       // Arrange
       mockBoard.canActiveTetrominoMoveDown.mockReturnValue(false)
       mockPlayfield.hasLineToClear.mockReturnValue(true)
-      
+
       // Act - wait for lock delay
       lockingState.update(700) // 700ms lock delay
-      
+
       // Assert
       expect(lockingState.getTransition()).toBe(PlayingStateType.CLEARING_LINES)
     })
@@ -58,10 +58,10 @@ describe('LockingState', () => {
       // Arrange
       mockBoard.canActiveTetrominoMoveDown.mockReturnValue(false)
       mockPlayfield.hasLineToClear.mockReturnValue(false)
-      
+
       // Act - wait for lock delay
       lockingState.update(700) // 700ms lock delay
-      
+
       // Assert
       expect(lockingState.getTransition()).toBe(PlayingStateType.FALLING)
     })
@@ -70,10 +70,10 @@ describe('LockingState', () => {
       // Arrange
       mockBoard.canActiveTetrominoMoveDown.mockReturnValue(false)
       mockPlayfield.hasLineToClear.mockReturnValue(false)
-      
+
       // Act - wait for lock delay
       lockingState.update(700)
-      
+
       // Assert
       expect(mockBoard.mergeActiveTetromino).toHaveBeenCalled()
       expect(mockBoard.spawnTetromino).toHaveBeenCalled()
@@ -83,10 +83,10 @@ describe('LockingState', () => {
       // Arrange
       mockBoard.canActiveTetrominoMoveDown.mockReturnValue(false)
       mockPlayfield.hasLineToClear.mockReturnValue(false)
-      
+
       // Act - wait for lock delay
       lockingState.update(700)
-      
+
       // Assert
       expect(mockScoring.setCombo).toHaveBeenCalledWith(0)
     })
@@ -96,7 +96,7 @@ describe('LockingState', () => {
     it('should handle left arrow input', () => {
       // Act
       lockingState.handleInput(['ArrowLeft'])
-      
+
       // Assert
       expect(mockBoard.moveLeft).toHaveBeenCalled()
     })
@@ -104,7 +104,7 @@ describe('LockingState', () => {
     it('should handle right arrow input', () => {
       // Act
       lockingState.handleInput(['ArrowRight'])
-      
+
       // Assert
       expect(mockBoard.moveRight).toHaveBeenCalled()
     })
@@ -112,7 +112,7 @@ describe('LockingState', () => {
     it('should handle up arrow input (rotate right)', () => {
       // Act
       lockingState.handleInput(['ArrowUp'])
-      
+
       // Assert
       expect(mockBoard.rotateRight).toHaveBeenCalled()
     })
@@ -120,7 +120,7 @@ describe('LockingState', () => {
     it('should handle Z key input (rotate left)', () => {
       // Act
       lockingState.handleInput(['KeyZ'])
-      
+
       // Assert
       expect(mockBoard.rotateLeft).toHaveBeenCalled()
     })
@@ -128,7 +128,7 @@ describe('LockingState', () => {
     it('should handle hold tetromino with C key', () => {
       // Act
       lockingState.handleInput(['KeyC'])
-      
+
       // Assert
       expect(mockBoard.holdTetromino).toHaveBeenCalled()
     })
@@ -136,7 +136,7 @@ describe('LockingState', () => {
     it('should handle soft drop during lock delay', () => {
       // Act
       lockingState.handleInput(['ArrowDown'])
-      
+
       // Assert
       expect(mockBoard.moveDown).toHaveBeenCalled()
       expect(mockScoring.addSoftDropPoints).toHaveBeenCalledWith(1)
@@ -145,12 +145,12 @@ describe('LockingState', () => {
     it('should reset lock timer on soft drop', () => {
       // Arrange
       mockBoard.canActiveTetrominoMoveDown.mockReturnValue(true)
-      
+
       // Act - advance timer, then soft drop
       lockingState.update(500) // 500ms into lock delay
       lockingState.handleInput(['ArrowDown'])
       lockingState.update(100) // 100ms more
-      
+
       // Assert - should not have transitioned yet (timer reset)
       expect(lockingState.getTransition()).toBeNull()
     })
@@ -170,9 +170,9 @@ describe('LockingState', () => {
     it('should initialize lock timer', () => {
       // Act
       lockingState.enter()
-      
+
       // Assert - should not transition immediately
       expect(lockingState.getTransition()).toBeNull()
     })
   })
-}) 
+})

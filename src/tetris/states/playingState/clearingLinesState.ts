@@ -17,6 +17,12 @@ export default class ClearingLinesState extends State<PlayingStateType> {
     this.playingState = playingState
   }
 
+  enter(): void {
+    super.enter()
+    this.clearTimer = 0
+    this.linesToClear = this.getLinesToClear()
+  }
+
   update(deltaTime: number): void {
     this.clearTimer += deltaTime
 
@@ -32,10 +38,6 @@ export default class ClearingLinesState extends State<PlayingStateType> {
 
       this.setTransition(PlayingStateType.FALLING)
     }
-  }
-
-  handleInput(): void {
-    // No input handling during line clearing
   }
 
   render(ctx: CanvasRenderingContext2D) {
@@ -70,15 +72,10 @@ export default class ClearingLinesState extends State<PlayingStateType> {
     }
   }
 
-  enter(): void {
-    super.enter()
-    this.clearTimer = 0
-    this.linesToClear = this.getLinesToClear()
+  handleInput(): void {
+    // No input handling during line clearing
   }
 
-  /**
-   * Detect T-spin and award appropriate points
-   */
   private detectAndAwardTSpin(): void {
     const board = this.gameCore.getBoard()
     const tSpinResult = board.detectTSpin()

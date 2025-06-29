@@ -1,14 +1,14 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import FallingState from '../fallingState'
 import { PlayingStateType } from '../playingStateMachine'
-import { 
-  createAllMocks, 
-  resetAllMocks, 
+import {
+  createAllMocks,
+  resetAllMocks,
   createMockCanvasRenderingContext2D,
   createMockPlayingState,
   type MockBoard,
   type MockScoring,
-  type MockPlayfield
+  type MockPlayfield,
 } from './mocks'
 import type PlayingState from '../index'
 
@@ -29,7 +29,10 @@ describe('FallingState', () => {
     mockPlayfield = mocks.playfield
 
     // Create FallingState instance
-    fallingState = new FallingState(mocks.gameCore, createMockPlayingState() as unknown as PlayingState)
+    fallingState = new FallingState(
+      mocks.gameCore,
+      createMockPlayingState() as unknown as PlayingState
+    )
   })
 
   describe('update', () => {

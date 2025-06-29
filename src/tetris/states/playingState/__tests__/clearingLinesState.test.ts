@@ -1,15 +1,15 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import ClearingLinesState from '../clearingLinesState'
 import { PlayingStateType } from '../playingStateMachine'
-import { 
-  createAllMocks, 
-  resetAllMocks, 
+import {
+  createAllMocks,
+  resetAllMocks,
   createMockCanvasRenderingContext2D,
   createMockPlayingState,
   type MockBoard,
   type MockScoring,
   type MockPlayfield,
-  type MockLevel
+  type MockLevel,
 } from './mocks'
 import type PlayingState from '../index'
 
@@ -32,7 +32,10 @@ describe('ClearingLinesState', () => {
     mockLevel = mocks.level
 
     // Create ClearingLinesState instance
-    clearingLinesState = new ClearingLinesState(mocks.gameCore, createMockPlayingState() as unknown as PlayingState)
+    clearingLinesState = new ClearingLinesState(
+      mocks.gameCore,
+      createMockPlayingState() as unknown as PlayingState
+    )
   })
 
   describe('update', () => {
@@ -44,7 +47,7 @@ describe('ClearingLinesState', () => {
     it('should transition to FALLING after clear delay', () => {
       // Act - simulate enough time for clearing
       clearingLinesState.update(300) // 300ms clear delay
-      
+
       // Assert
       expect(clearingLinesState.getTransition()).toBe(PlayingStateType.FALLING)
     })
@@ -52,7 +55,7 @@ describe('ClearingLinesState', () => {
     it('should clear lines and update level after delay', () => {
       // Act
       clearingLinesState.update(300)
-      
+
       // Assert
       expect(mockPlayfield.clearLines).toHaveBeenCalled()
       expect(mockLevel.addClearedLines).toHaveBeenCalledWith(10) // 10 full lines
@@ -62,10 +65,10 @@ describe('ClearingLinesState', () => {
     it('should detect and award T-spin points', () => {
       // Arrange
       mockBoard.detectTSpin.mockReturnValue({ isTSpin: true, isMiniTSpin: false, cornerCount: 3 })
-      
+
       // Act
       clearingLinesState.update(300)
-      
+
       // Assert
       expect(mockScoring.addTSpinSingle).toHaveBeenCalled()
       expect(mockScoring.addComboPoints).toHaveBeenCalled()
@@ -74,10 +77,10 @@ describe('ClearingLinesState', () => {
     it('should detect and award Mini T-spin points', () => {
       // Arrange
       mockBoard.detectTSpin.mockReturnValue({ isTSpin: false, isMiniTSpin: true, cornerCount: 2 })
-      
+
       // Act
       clearingLinesState.update(300)
-      
+
       // Assert
       expect(mockScoring.addMiniTSpinSingle).toHaveBeenCalled()
       expect(mockScoring.addComboPoints).toHaveBeenCalled()
@@ -86,10 +89,10 @@ describe('ClearingLinesState', () => {
     it('should award regular line clear points when no T-spin', () => {
       // Arrange
       mockBoard.detectTSpin.mockReturnValue({ isTSpin: false, isMiniTSpin: false, cornerCount: 0 })
-      
+
       // Act
       clearingLinesState.update(300)
-      
+
       // Assert
       expect(mockScoring.addTetris).toHaveBeenCalled() // 10 lines = Tetris
       expect(mockScoring.addComboPoints).toHaveBeenCalled()
@@ -98,10 +101,10 @@ describe('ClearingLinesState', () => {
     it('should update combo when lines are cleared', () => {
       // Arrange
       mockScoring.getCombo.mockReturnValue(2)
-      
+
       // Act
       clearingLinesState.update(300)
-      
+
       // Assert
       expect(mockScoring.setCombo).toHaveBeenCalledWith(3) // 2 + 1
     })
@@ -128,9 +131,9 @@ describe('ClearingLinesState', () => {
     it('should initialize clear timer and lines to clear', () => {
       // Act
       clearingLinesState.enter()
-      
+
       // Assert - should not throw and initialize properly
       expect(() => clearingLinesState.update(100)).not.toThrow()
     })
   })
-}) 
+})

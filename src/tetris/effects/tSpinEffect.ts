@@ -20,14 +20,13 @@ export class TSpinEffect extends Effect {
     ctx.fillStyle = '#ff6b6b'
     ctx.globalAlpha = 1 - this.progress
     ctx.fillText(`${this.tSpinType}`, config.board.width / 2, 150)
-    
+
     if (this.linesCleared > 0) {
       ctx.font = `${30 * 2 * this.progress + 30}px Game`
       ctx.fillStyle = '#4ecdc4'
       ctx.fillText(`${this.linesCleared} Lines!`, config.board.width / 2, 200)
     }
-    
+
     ctx.restore()
   }
-} 
- 
+}

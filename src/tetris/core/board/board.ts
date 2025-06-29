@@ -63,8 +63,11 @@ export default class Board {
       return false
     }
 
-    const currentTetromino = new Tetromino(this.activeTetromino.getType(), this.activeTetromino.getColor())
-    
+    const currentTetromino = new Tetromino(
+      this.activeTetromino.getType(),
+      this.activeTetromino.getColor()
+    )
+
     if (this.heldTetromino) {
       // Swap with held tetromino
       this.activeTetromino = new ActiveTetromino(this.heldTetromino)
@@ -74,10 +77,10 @@ export default class Board {
       this.heldTetromino = currentTetromino
       this.activeTetromino = this.nextTetromino()
     }
-    
+
     this.tetrominoMover = new TetrominoMover(this.playfield, this.activeTetromino)
     this.canHold = false
-    
+
     return true
   }
 
@@ -108,7 +111,7 @@ export default class Board {
   private generateQueue() {
     return [
       new Tetromino(TetrominoType.TShape, 1),
-      ...Array.from({ length: QUEUE_SIZE - 1 }, () => this.generateTetromino())
+      ...Array.from({ length: QUEUE_SIZE - 1 }, () => this.generateTetromino()),
     ]
   }
 

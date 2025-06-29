@@ -21,9 +21,9 @@ export class ShakeEffect extends Effect {
     }
   }
 
-  render(ctx: CanvasRenderingContext2D) {    
+  render(ctx: CanvasRenderingContext2D) {
     const shakeFactor = this.getShakeFactor()
-    const shakedCanvas =  cutCanvas(ctx.canvas, 0, 0, config.board.width, config.board.height)
+    const shakedCanvas = cutCanvas(ctx.canvas, 0, 0, config.board.width, config.board.height)
     clearCanvas(ctx.canvas, 0, 0, config.board.width, config.board.height)
     drawCanvas(ctx, shakedCanvas, this.sideFactor * shakeFactor, this.topFactor * shakeFactor)
   }

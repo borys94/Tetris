@@ -35,12 +35,12 @@ export default class TSpinDetector {
     }
 
     const cornerCount = this.getCornerCount()
-    
+
     // Full T-spin: 3 or 4 corners occupied
     if (cornerCount >= 3) {
       return { isTSpin: true, isMiniTSpin: false, cornerCount }
     }
-    
+
     // Mini T-spin: 2 corners occupied
     if (cornerCount === 2) {
       return { isTSpin: false, isMiniTSpin: true, cornerCount }
@@ -69,7 +69,7 @@ export default class TSpinDetector {
     // T-piece has 4 blocks in a T shape, so we need to find the center
     const sortedByX = [...blocks].sort(([x1], [x2]) => x1 - x2)
     const sortedByY = [...blocks].sort(([, y1], [, y2]) => y1 - y2)
-    
+
     // The center is the middle block in both X and Y directions
     const centerX = sortedByX[1][0] // Middle X position
     const centerY = sortedByY[1][1] // Middle Y position
@@ -111,4 +111,4 @@ export default class TSpinDetector {
     const blocks = this.playfield.getBlocks()
     return blocks.some(([blockX, blockY]) => blockX === x && blockY === y)
   }
-} 
+}

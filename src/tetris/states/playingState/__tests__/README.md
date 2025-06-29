@@ -15,6 +15,7 @@ Plik `mocks.ts` zawiera wszystkie mocki potrzebne do testowania stanów gry. Zos
 ## Dostępne mocki
 
 ### Interfejsy TypeScript
+
 Interfejsy mocków są oparte na rzeczywistych klasach z projektu:
 
 - `MockPlayfield` - mock dla pola gry (oparty na klasie `Playfield`)
@@ -25,6 +26,7 @@ Interfejsy mocków są oparte na rzeczywistych klasach z projektu:
 - `MockContext` - mock dla kontekstu Canvas
 
 ### Funkcje tworzące mocki
+
 - `createMockPlayfield()` - tworzy mock pola gry z wszystkimi metodami z klasy `Playfield`
 - `createMockBoard(playfield?)` - tworzy mock planszy z wszystkimi metodami z klasy `Board`
 - `createMockScoring()` - tworzy mock systemu punktacji z wszystkimi metodami z klasy `Scoring`
@@ -34,19 +36,20 @@ Interfejsy mocków są oparte na rzeczywistych klasach z projektu:
 - `createMockCanvasRenderingContext2D()` - tworzy mock kontekstu Canvas jako CanvasRenderingContext2D
 
 ### Funkcje pomocnicze
+
 - `resetAllMocks()` - resetuje wszystkie mocki
 - `createAllMocks()` - tworzy wszystkie mocki na raz i zwraca je jako obiekt
 
 ## Przykład użycia
 
 ```typescript
-import { 
-  createAllMocks, 
-  resetAllMocks, 
+import {
+  createAllMocks,
+  resetAllMocks,
   createMockCanvasRenderingContext2D,
   type MockBoard,
   type MockScoring,
-  type MockPlayfield
+  type MockPlayfield,
 } from './mocks'
 
 describe('MyState', () => {
@@ -56,12 +59,12 @@ describe('MyState', () => {
 
   beforeEach(() => {
     resetAllMocks()
-    
+
     const mocks = createAllMocks()
     mockBoard = mocks.board
     mockScoring = mocks.scoring
     mockPlayfield = mocks.playfield
-    
+
     // Użyj mocks.gameCore w konstruktorze
   })
 })
@@ -81,6 +84,7 @@ describe('MyState', () => {
 ## Metody w mockach
 
 ### MockPlayfield
+
 - `getWidth()` - zwraca szerokość pola
 - `getHeight()` - zwraca wysokość pola
 - `getBlocks()` - zwraca bloki na polu
@@ -90,6 +94,7 @@ describe('MyState', () => {
 - `clearLines()` - czyści pełne linie
 
 ### MockBoard
+
 - `moveDown()`, `moveLeft()`, `moveRight()` - ruchy tetromino
 - `rotateRight()`, `rotateLeft()` - obroty tetromino
 - `mergeActiveTetromino()` - łączy aktywne tetromino
@@ -102,6 +107,7 @@ describe('MyState', () => {
 - `getGhostTetromino()` - zwraca ghost tetromino
 
 ### MockScoring
+
 - `addSingleLine()`, `addDoubleLine()`, `addTripleLine()`, `addTetris()` - punkty za linie
 - `addTSpinSingle()`, `addTSpinDouble()`, `addTSpinTriple()` - punkty za T-spin
 - `addMiniTSpinSingle()`, `addMiniTSpinDouble()` - punkty za mini T-spin
@@ -112,7 +118,8 @@ describe('MyState', () => {
 - `reset()` - resetuje wynik
 
 ### MockLevel
+
 - `addClearedLines(lines)` - dodaje wyczyszczone linie
 - `getLevel()` - zwraca aktualny poziom
 - `getClearedLines()` - zwraca liczbę wyczyszczonych linii
-- `reset()` - resetuje poziom 
+- `reset()` - resetuje poziom

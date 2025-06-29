@@ -186,13 +186,13 @@ const renderHeldTetromino = (ctx: CanvasRenderingContext2D, gameCore: GameCore) 
 
   if (heldTetromino) {
     const blocks = heldTetromino.getBlocks()
-    
+
     // Center the tetromino in the hold area
     const minX = Math.min(...blocks.map(([x]) => x))
     const maxX = Math.max(...blocks.map(([x]) => x))
     const minY = Math.min(...blocks.map(([, y]) => y))
     const maxY = Math.max(...blocks.map(([, y]) => y))
-    
+
     const offsetX = (4 - (maxX - minX + 1)) / 2
     const offsetY = (4 - (maxY - minY + 1)) / 2
 

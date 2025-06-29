@@ -106,4 +106,4 @@ describe('Board', () => {
       expect(board.canHoldTetromino()).toBe(true)
     })
   })
-}) 
+})
