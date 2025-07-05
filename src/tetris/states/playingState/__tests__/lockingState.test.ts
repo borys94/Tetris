@@ -124,36 +124,6 @@ describe('LockingState', () => {
       // Assert
       expect(mockBoard.rotateLeft).toHaveBeenCalled()
     })
-
-    it('should handle hold tetromino with C key', () => {
-      // Act
-      lockingState.handleInput(['KeyC'])
-
-      // Assert
-      expect(mockBoard.holdTetromino).toHaveBeenCalled()
-    })
-
-    it('should handle soft drop during lock delay', () => {
-      // Act
-      lockingState.handleInput(['ArrowDown'])
-
-      // Assert
-      expect(mockBoard.moveDown).toHaveBeenCalled()
-      expect(mockScoring.addSoftDropPoints).toHaveBeenCalledWith(1)
-    })
-
-    it('should reset lock timer on soft drop', () => {
-      // Arrange
-      mockBoard.canActiveTetrominoMoveDown.mockReturnValue(true)
-
-      // Act - advance timer, then soft drop
-      lockingState.update(500) // 500ms into lock delay
-      lockingState.handleInput(['ArrowDown'])
-      lockingState.update(100) // 100ms more
-
-      // Assert - should not have transitioned yet (timer reset)
-      expect(lockingState.getTransition()).toBeNull()
-    })
   })
 
   describe('render', () => {

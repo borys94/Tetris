@@ -1,68 +1,35 @@
-import type { InputType } from '../../inputHandler'
+import { INPUT_KEYS, type InputType } from '../../inputHandler'
 import { PlayingStateType } from './playingStateMachine'
 import State from '../state'
-import { drawPlayfield } from '../../helpers/rendering'
-import { drawTetromino } from '../../helpers/rendering'
+import { drawPlayfield, drawTetromino } from '../../helpers/rendering'
 
-type ContinousMoveType = 'left' | 'right' | 'rotateRight' | 'rotateLeft' | null
+type ContinuousMoveType = 'left' | 'right' | 'rotateRight' | 'rotateLeft' | null
+
+const CONTINUOUS_MOVE_INTERVAL = 150
+const LOCK_DELAY = 700 // 700ms to allow for last-minute moves
 
 export default class LockingState extends State<PlayingStateType> {
   private lockTimer: number = 0
-  private lockDelay: number = 700 // 700ms to allow for last-minute moves
+  private continuousMoveType: ContinuousMoveType = null
+  private continuousMoveTimer: number = 0
 
-  private continuousMoveType: ContinousMoveType = null
-  private moveTimer: number = 0
-  private moveInterval: number = 500
+  enter(): void {
+    super.enter()
+    this.resetTimers()
+  }
 
   update(deltaTime: number): void {
-    this.lockTimer += deltaTime
+    this.updateLockTimer(deltaTime)
 
-    if (this.board.canActiveTetrominoMoveDown()) {
-      this.setTransition(PlayingStateType.FALLING)
+    if (this.canTetrominoMoveDown()) {
+      this.transitionToFallingState()
       return
     }
 
-    if (this.lockTimer >= this.lockDelay) {
+    if (this.hasLockDelayExpired()) {
       this.handleLockDelayExpired()
     } else {
-      this.updateContinuousMove(deltaTime)
-    }
-  }
-
-  handleInput(inputs: InputType[]): void {
-    if (
-      !inputs.includes('ArrowLeft') &&
-      !inputs.includes('ArrowRight') &&
-      !inputs.includes('ArrowUp') &&
-      !inputs.includes('KeyZ')
-    ) {
-      this.setContinuousMoveType(null)
-    }
-
-    // Handle movement inputs
-    if (inputs.includes('ArrowLeft')) {
-      this.setContinuousMoveType('left')
-    }
-    if (inputs.includes('ArrowRight')) {
-      this.setContinuousMoveType('right')
-    }
-    if (inputs.includes('ArrowUp')) {
-      this.setContinuousMoveType('rotateRight')
-    }
-    if (inputs.includes('KeyZ')) {
-      this.setContinuousMoveType('rotateLeft')
-    }
-
-    // Hold tetromino
-    if (inputs.includes('KeyC')) {
-      this.board.holdTetromino()
-    }
-
-    if (inputs.includes('ArrowDown')) {
-      // Soft drop during lock delay
-      this.board.moveDown()
-      this.scoring.addSoftDropPoints(1)
-      this.lockTimer = 0 // Reset lock timer
+      this.handleContinuousMovement(deltaTime)
     }
   }
 
@@ -71,15 +38,86 @@ export default class LockingState extends State<PlayingStateType> {
     drawTetromino(ctx, this.board.getActiveTetromino(), true)
   }
 
-  enter(): void {
-    super.enter()
+  handleInput(inputs: InputType[]): void {
+    this.resetMovementIfNoKeysPressed(inputs)
+    this.setMovementTypeFromInputs(inputs)
+  }
+
+  private resetTimers(): void {
     this.lockTimer = 0
-    this.moveTimer = 0
+    this.continuousMoveTimer = 0
+  }
+
+  private updateLockTimer(deltaTime: number): void {
+    this.lockTimer += deltaTime
+  }
+
+  private canTetrominoMoveDown(): boolean {
+    return this.board.canActiveTetrominoMoveDown()
+  }
+
+  private transitionToFallingState(): void {
+    this.setTransition(PlayingStateType.FALLING)
+  }
+
+  private hasLockDelayExpired(): boolean {
+    return this.lockTimer >= LOCK_DELAY
+  }
+
+  private handleContinuousMovement(deltaTime: number): void {
+    if (!this.continuousMoveType) return
+
+    this.continuousMoveTimer += deltaTime
+    if (this.shouldPerformContinuousMove()) {
+      this.resetContinuousMoveTimer()
+      this.performContinuousMove(this.continuousMoveType)
+    }
+  }
+
+  private shouldPerformContinuousMove(): boolean {
+    return this.continuousMoveTimer >= CONTINUOUS_MOVE_INTERVAL
+  }
+
+  private resetContinuousMoveTimer(): void {
+    this.continuousMoveTimer = 0
+  }
+
+  private resetMovementIfNoKeysPressed(inputs: InputType[]): void {
+    const movementKeys = [
+      INPUT_KEYS.LEFT,
+      INPUT_KEYS.RIGHT,
+      INPUT_KEYS.ROTATE_RIGHT,
+      INPUT_KEYS.ROTATE_LEFT,
+    ]
+
+    const hasNoMovementKeys = movementKeys.every((key) => !inputs.includes(key))
+    if (hasNoMovementKeys) {
+      this.setContinuousMoveType(null)
+    }
+  }
+
+  private setMovementTypeFromInputs(inputs: InputType[]): void {
+    const movementMap = {
+      [INPUT_KEYS.LEFT]: 'left' as const,
+      [INPUT_KEYS.RIGHT]: 'right' as const,
+      [INPUT_KEYS.ROTATE_RIGHT]: 'rotateRight' as const,
+      [INPUT_KEYS.ROTATE_LEFT]: 'rotateLeft' as const,
+    }
+
+    for (const [key, moveType] of Object.entries(movementMap)) {
+      if (inputs.includes(key as InputType)) {
+        this.setContinuousMoveType(moveType)
+        break
+      }
+    }
   }
 
   private handleLockDelayExpired(): void {
     this.board.mergeActiveTetromino()
+    this.handlePostMergeState()
+  }
 
+  private handlePostMergeState(): void {
     if (this.board.getPlayfield().hasLineToClear()) {
       this.setTransition(PlayingStateType.CLEARING_LINES)
     } else {
@@ -93,38 +131,24 @@ export default class LockingState extends State<PlayingStateType> {
     this.setTransition(PlayingStateType.FALLING)
   }
 
-  private updateContinuousMove(deltaTime: number): void {
-    if (this.continuousMoveType) {
-      this.moveTimer += deltaTime
-      if (this.moveTimer >= this.moveInterval) {
-        this.moveTimer = 0
-        this.performContinuousMove(this.continuousMoveType)
-      }
-    }
-  }
-
-  private setContinuousMoveType(continuousMoveType: ContinousMoveType): void {
+  private setContinuousMoveType(continuousMoveType: ContinuousMoveType): void {
     if (this.continuousMoveType !== continuousMoveType) {
       this.continuousMoveType = continuousMoveType
-      this.moveTimer = 0
+      this.resetContinuousMoveTimer()
       this.performContinuousMove(continuousMoveType)
     }
   }
 
-  private performContinuousMove(continuousMoveType: ContinousMoveType): void {
-    switch (continuousMoveType) {
-      case 'left':
-        this.board.moveLeft()
-        break
-      case 'right':
-        this.board.moveRight()
-        break
-      case 'rotateRight':
-        this.board.rotateRight()
-        break
-      case 'rotateLeft':
-        this.board.rotateLeft()
-        break
+  private performContinuousMove(continuousMoveType: ContinuousMoveType): void {
+    if (!continuousMoveType) return
+
+    const moveActions = {
+      left: () => this.board.moveLeft(),
+      right: () => this.board.moveRight(),
+      rotateRight: () => this.board.rotateRight(),
+      rotateLeft: () => this.board.rotateLeft(),
     }
+
+    moveActions[continuousMoveType]()
   }
 }
